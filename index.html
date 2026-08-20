@@ -83,7 +83,7 @@ layout: default
       {%- for role in current_roles -%}
       <div class="role">
         <div class="role__top">
-          <h3 class="role__title">{{ role.role }}<span class="role__fte">{{ role.fte }}</span></h3>
+          <h3 class="role__title">{{ role.role }}</h3>
           <span class="role__when">{{ role.start }} — {{ role.end }}</span>
         </div>
         <p class="item__sub"><span class="role__org">{{ role.org }}</span>{% if role.location %} · {{ role.location }}{% endif %}</p>
