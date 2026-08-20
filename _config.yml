@@ -4,7 +4,7 @@
 # NOTE ON URLs
 # This repo sits under the `esquaredsystems` organisation, so GitHub Pages
 # serves it as a *project* page at:
-#     https://esquaredsystems.github.io/owaishussain.github.io/
+#     https://esquaredsystems.github.io/founder/
 #
 # If you ever attach a custom domain (e.g. owaishussain.com) or move the repo
 # to a personal account named `owaishussain`, change the two lines below to:
@@ -20,7 +20,7 @@ description: >-
   mining, machine learning and health informatics.
 
 url: "https://esquaredsystems.github.io"
-baseurl: "/owaishussain.github.io"
+baseurl: "/founder"
 
 # ---------------------------------------------------------------------------
 # Build

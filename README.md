@@ -1,9 +1,9 @@
-# owaishussain.github.io
+# founder
 
 Personal site of Owais A. Hussain — built with [Jekyll](https://jekyllrb.com/)
 and served by GitHub Pages.
 
-**Live:** https://esquaredsystems.github.io/owaishussain.github.io/
+**Live:** https://esquaredsystems.github.io/founder/
 
 Adding content is one commit. There is no build step to run, no plugins to
 install, and no CI to configure — push to `master` and GitHub rebuilds the site.
@@ -76,10 +76,10 @@ You do not need this to publish — but if you want a preview before pushing:
 ```bash
 gem install bundler
 bundle install          # first time only, a few minutes
-bundle exec jekyll serve --livereload
+bundle exec jekyll serve --livereload --baseurl ""
 ```
 
-Then open **http://localhost:4000/owaishussain.github.io/**
+Then open **http://localhost:4000/**
 
 Leave it running: every time you save a file the site rebuilds and the browser
 refreshes. Stop it with `Ctrl+C`.
@@ -107,7 +107,7 @@ treats it as a *project* page and serves it from a subpath. That is why
 
 ```yaml
 url: "https://esquaredsystems.github.io"
-baseurl: "/owaishussain.github.io"
+baseurl: "/founder"
 ```
 
 If you later:

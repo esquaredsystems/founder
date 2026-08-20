@@ -2,7 +2,9 @@
 <a class="skip-link" href="#main">Skip to content</a>
 <header class="site-header">
   <div class="wrap site-header__inner">
-    <a class="brand" href="{{ '/' | relative_url }}">{{ site_name }}</a>
+    <a class="brand" href="{{ '/' | relative_url }}" aria-label="Home" title="Home">
+      {% include icon.html name="home" %}
+    </a>
     <nav class="site-nav" aria-label="Main">
       {%- for item in site.nav -%}
       {%- assign is_current = false -%}
