@@ -1,0 +1,50 @@
+---
+layout: default
+title: Teaching
+description: Undergraduate courses taught at the Karachi Institute of Economics and Technology — software engineering, algorithms, web, mobile and decentralised application development.
+permalink: /teaching/
+---
+{% include site-vars.html %}
+{%- assign terms = site.data.teaching | group_by: "term" -%}
+{%- assign grades = site.data.grades -%}
+{%- assign max = 0 -%}
+{%- for g in grades -%}
+  {%- assign n = g.count | plus: 0 -%}
+  {%- if n > max %}{% assign max = n %}{% endif -%}
+{%- endfor -%}
+
+<div class="wrap">
+  <div class="page-head">
+    <span class="eyebrow">Academia</span>
+    <h1>Teaching</h1>
+    <p class="lede prose" style="max-width:64ch">{{ teaching_intro }}</p>
+  </div>
+
+  <div class="prose" style="max-width:none">
+    {%- for term in terms -%}
+    <section style="margin-bottom:3rem">
+      <h2 style="margin-bottom:0.5rem">{{ term.name }}</h2>
+      {%- for course in term.items -%}
+      <details class="course">
+        <summary>{{ course.course }}</summary>
+        <div class="course__body">{{ course.topics }}</div>
+      </details>
+      {%- endfor -%}
+    </section>
+    {%- endfor -%}
+
+    <section>
+      <h2>Aggregate grades</h2>
+      <p class="muted" style="max-width:60ch">Distribution across all courses taught to date.</p>
+      <div class="bars">
+        {%- for g in grades -%}
+        <div class="bar">
+          <span class="bar__label">{{ g.grade }}</span>
+          <span class="bar__track"><span class="bar__fill" style="width: {{ g.count | times: 100 | divided_by: max }}%"></span></span>
+          <span class="bar__value">{{ g.count }}</span>
+        </div>
+        {%- endfor -%}
+      </div>
+    </section>
+  </div>
+</div>

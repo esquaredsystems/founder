@@ -1,0 +1,146 @@
+---
+layout: default
+---
+{% include site-vars.html %}
+
+{%- assign featured = site.data.projects | where: "featured", "yes" | sort: "order" | reverse -%}
+{%- assign pubs = site.data.papers -%}
+
+<section class="hero">
+  <div class="wrap hero__grid">
+    <div>
+      <span class="eyebrow">{{ site_role }}{% for m in site_memberships %} · {{ m.extra2 }}, {{ m.name }}{% endfor %}</span>
+      <h1>{{ site_name }}</h1>
+      <p class="hero__tagline">“{{ site_tagline }}”</p>
+      <p class="hero__blurb">{{ site_blurb }}</p>
+      <div class="hero__actions">
+        <a class="btn btn--primary" href="{{ '/about/' | relative_url }}">About me {% include icon.html name="arrow" %}</a>
+        <a class="btn" href="{{ '/research/' | relative_url }}">Research</a>
+        <a class="btn" href="{{ '/projects/' | relative_url }}">Projects</a>
+      </div>
+      <div class="chips" style="margin-top:1.6rem">
+        {%- for link in site_links -%}
+        {%- if link.primary == "yes" -%}
+        <a class="chip" href="{{ link.url }}" rel="me noopener">{% include icon.html name=link.icon %}{{ link.name }}</a>
+        {%- endif -%}
+        {%- endfor -%}
+      </div>
+    </div>
+    {%- if site_portrait %}
+    <figure class="hero__portrait">
+      <img src="{{ site_portrait | relative_url }}"
+           {% if site_portrait2x %}srcset="{{ site_portrait | relative_url }} 1x, {{ site_portrait2x | relative_url }} 2x"{% endif %}
+           alt="{{ site_name }}" width="600" height="600" fetchpriority="high">
+    </figure>
+    {%- endif %}
+  </div>
+</section>
+
+<section class="section section--soft">
+  <div class="wrap">
+    {%- comment -%} Every figure below is counted from the data files, so it
+    stays correct as content is added. {%- endcomment -%}
+    {%- assign published = pubs | where_exp: "r", "r.year" | size -%}
+    {%- assign courses = site.data.teaching | size -%}
+    {%- assign certs = site.data.certifications | size -%}
+    <div class="stats">
+      <div class="stat"><span class="stat__num">17+</span><span class="stat__label">years in industry</span></div>
+      <div class="stat"><span class="stat__num">{{ published }}</span><span class="stat__label">peer-reviewed papers</span></div>
+      <div class="stat"><span class="stat__num">{{ site.data.projects | size }}</span><span class="stat__label">projects shipped</span></div>
+      <div class="stat"><span class="stat__num">{{ courses }}</span><span class="stat__label">courses taught</span></div>
+      <div class="stat"><span class="stat__num">{{ certs }}</span><span class="stat__label">certifications</span></div>
+    </div>
+
+    <div class="timeline" style="margin-top:2.5rem" aria-label="Career timeline">
+      {%- for t in site.data.timeline -%}
+      <div class="timeline__item{% if t.major == "yes" %} timeline__item--major{% endif %}">
+        <span class="timeline__year">{{ t.year }}</span>
+        <span class="timeline__what">{{ t.what }}</span>
+        <span class="timeline__where">{{ t.where }}</span>
+      </div>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="section__head">
+      <h2>Geographical footprint</h2>
+    </div>
+    {% include countries.html %}
+  </div>
+</section>
+
+<section class="section section--soft">
+  <div class="wrap">
+    <div class="section__head">
+      <h2>Currently</h2>
+      <a href="{{ '/about/' | relative_url }}">More about me {% include icon.html name="arrow" %}</a>
+    </div>
+    <div>
+      {%- assign current_roles = site.data.companies | where: "status", "current" -%}
+      {%- for role in current_roles -%}
+      <div class="role">
+        <div class="role__top">
+          <h3 class="role__title">{{ role.role }}<span class="role__fte">{{ role.fte }}</span></h3>
+          <span class="role__when">{{ role.start }} — {{ role.end }}</span>
+        </div>
+        <p class="item__sub"><span class="role__org">{{ role.org }}</span>{% if role.location %} · {{ role.location }}{% endif %}</p>
+        <p class="item__body">{{ role.summary }}</p>
+      </div>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="section__head">
+      <h2>Selected projects</h2>
+      <a href="{{ '/projects/' | relative_url }}">All {{ site.data.projects | size }} projects {% include icon.html name="arrow" %}</a>
+    </div>
+    <div class="card-grid">
+      {%- for project in featured limit: 6 -%}
+      <a class="card" href="{{ '/projects/' | append: project.slug | append: '/' | relative_url }}">
+        {% include domain-icon.html project=project %}
+        <span class="card__meta"><span>{{ project.org }}</span>{% if project.year %}<span>{{ project.year }}</span>{% endif %}</span>
+        <h3 class="card__title">{{ project.title }}</h3>
+        <p class="card__body">{{ project.summary }}</p>
+      </a>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+<section class="section section--soft">
+  <div class="wrap">
+    <div class="section__head">
+      <h2>Recent research</h2>
+      <a href="{{ '/research/' | relative_url }}">All publications {% include icon.html name="arrow" %}</a>
+    </div>
+    <ul class="items">
+      {%- for pub in pubs limit: 4 -%}
+      <li class="item">
+        <div class="item__head">
+          <h3 class="item__title">{{ pub.title }}</h3>
+          <span class="item__year">{% if pub.year %}{{ pub.year }}{% else %}{{ pub.status | default: "—" }}{% endif %}</span>
+        </div>
+        <p class="item__sub">{{ pub.venue }}</p>
+      </li>
+      {%- endfor -%}
+    </ul>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div>
+      <h2 style="margin-top:0">Open to collaborate</h2>
+      <p>I want to bridge the gap between academia and industry. If you are working on social problems that software and data can help with, I would like to hear about it.</p>
+      <p style="margin-top:1.2rem">
+        <a class="btn btn--primary" href="mailto:{{ site_email }}">{% include icon.html name="mail" %} {{ site_email }}</a>
+      </p>
+    </div>
+  </div>
+</section>

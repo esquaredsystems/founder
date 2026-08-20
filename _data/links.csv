@@ -1,0 +1,10 @@
+#,kind,name,url,icon,primary,extra,extra2
+1,membership,IEEE,https://www.ieee.org/,,,Institute of Electrical and Electronics Engineers,Member
+2,link,LinkedIn,https://www.linkedin.com/in/owaishussain/,linkedin,yes,,
+3,link,Google Scholar,https://scholar.google.com/citations?user=vy_wkhcAAAAJ,scholar,yes,,
+4,link,ResearchGate,https://www.researchgate.net/profile/Owais-Hussain-3,research,yes,,
+5,link,Scopus,https://www.scopus.com/authid/detail.uri?authorId=56022524200,research,no,,
+6,link,GitHub,https://github.com/esquaredsystems,github,yes,,
+7,link,Email,mailto:owaishussain@ieee.org,mail,yes,,
+8,blog,Vision 360,https://owaisahussain.blogspot.com/,,,"Yet another blog about technology and development — software engineering, data science, mobile tech and the occasional rant.",en
+9,blog,بزمِ انجم,https://bazmeanjum.blogspot.com/,,,Urdu poetry and literature.,ur

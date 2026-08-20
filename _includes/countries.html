@@ -1,0 +1,34 @@
+{%- comment -%}
+  World map + flag row, driven entirely by _data/countries.csv.
+
+  The map is a static SVG committed to the repo (regenerate with
+  tools/build_world_map.py). Shading comes from a generated style block, so
+  adding a country is a data edit rather than a CSS edit. Hovering a country or
+  a flag names it under the map; the SVG paths also carry <title> elements, so
+  the map still names its countries with JavaScript disabled.
+{%- endcomment -%}
+{% include site-vars.html %}
+{%- assign countries = site.data.countries -%}
+
+<div class="countries" data-countries>
+  <style>
+    {%- for c in countries -%}#c-{{ c.code | upcase }}{% unless forloop.last %},{% endunless %}{%- endfor -%}
+    {%- if countries.size > 0 %} { fill: var(--map-worked); }{% endif %}
+  </style>
+
+  <div class="worldmap__frame">
+    {% include world-map.svg %}
+    <p class="worldmap__caption" data-caption>
+      <span class="worldmap__caption-default">{{ countries_label | default: "Countries I have worked in or travelled to" }} — {{ countries.size }}</span>
+    </p>
+  </div>
+
+  <ul class="flags flags--centred">
+    {%- for c in countries %}
+    <li class="flag" data-code="{{ c.code | upcase }}" data-name="{{ c.name }}" tabindex="0">
+      <img src="{{ '/assets/img/flags/' | append: c.code | append: '.svg' | relative_url }}" alt="{{ c.name }}" width="24" height="18" loading="lazy">
+      <span class="flag__tip">{{ c.name }}</span>
+    </li>
+    {%- endfor %}
+  </ul>
+</div>

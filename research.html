@@ -1,0 +1,45 @@
+---
+layout: default
+title: Research
+description: Peer-reviewed publications in influence mining, complex networks, machine learning and health informatics.
+permalink: /research/
+---
+{% include site-vars.html %}
+{%- assign pubs = site.data.papers -%}
+
+<div class="wrap">
+  <div class="page-head">
+    <span class="eyebrow">Publications</span>
+    <h1>Research</h1>
+    <p class="lede">Influence mining and complex networks, applied machine learning, and health
+    informatics — with a recent turn towards Web3 security.</p>
+  </div>
+
+  <div class="chips" style="margin-bottom:2.5rem">
+    {%- for link in site_links -%}
+    {%- if link.icon == 'scholar' or link.icon == 'research' or link.icon == 'linkedin' -%}
+    <a class="chip" href="{{ link.url }}" rel="noopener">{% include icon.html name=link.icon %}{{ link.name }}</a>
+    {%- endif -%}
+    {%- endfor -%}
+  </div>
+
+  <ul class="items">
+    {%- for pub in pubs -%}
+    <li class="item">
+      <div class="item__head">
+        <div>
+          <h2 class="item__title">{% if pub.url %}<a href="{{ pub.url }}" rel="noopener">{{ pub.title }}</a>{% else %}{{ pub.title }}{% endif %}</h2>
+          <p class="item__sub"><em>{{ pub.venue }}</em>{% if pub.authors %} — with {{ pub.authors }}{% endif %}</p>
+        </div>
+        <span class="item__year">{% if pub.year %}{{ pub.year }}{% else %}{{ pub.status }}{% endif %}</span>
+      </div>
+      {%- assign tags = pub.tags | split: ";" %}
+      {%- if tags.size > 0 %}
+      <div class="tags" style="margin-top:0.5rem">
+        {%- for t in tags %}<span class="tag">{{ t | strip }}</span>{% endfor -%}
+      </div>
+      {%- endif %}
+    </li>
+    {%- endfor -%}
+  </ul>
+</div>

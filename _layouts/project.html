@@ -1,0 +1,42 @@
+---
+layout: default
+---
+{%- comment -%}
+  A project write-up. The file in _projects/ carries only a `slug` and the prose;
+  every other field is looked up in _data/projects.csv so there is exactly one
+  place to edit metadata.
+{%- endcomment -%}
+{%- assign meta = site.data.projects | where: "slug", page.slug | first -%}
+
+<div class="wrap">
+  <article>
+    <div class="page-head prose">
+      <span class="eyebrow">
+        <a href="{{ '/projects/' | relative_url }}">Projects</a>
+        {%- if meta.org %} · {{ meta.org }}{% endif -%}
+        {%- if meta.year %} · {{ meta.year }}{% endif -%}
+      </span>
+      <h1>{{ meta.title | default: page.slug }}</h1>
+      {%- if meta.summary %}<p class="lede">{{ meta.summary }}</p>{% endif -%}
+      {%- assign tags = meta.tags | split: ";" -%}
+      {%- if tags.size > 0 %}
+      <div class="tags" style="margin-top:1rem">
+        {%- for t in tags %}<span class="tag">{{ t | strip }}</span>{% endfor -%}
+      </div>
+      {%- endif %}
+    </div>
+
+    <div class="prose post-body">
+      {{ content }}
+      {%- if meta.url_external %}
+      <p style="margin-top:2rem"><a class="btn" href="{{ meta.url_external }}" rel="noopener">Visit project {% include icon.html name="external" %}</a></p>
+      {%- endif %}
+    </div>
+  </article>
+
+  <div class="prose">
+    <nav class="post-nav" aria-label="Project navigation">
+      <span><a href="{{ '/projects/' | relative_url }}">← All projects</a></span>
+    </nav>
+  </div>
+</div>

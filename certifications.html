@@ -1,0 +1,44 @@
+---
+layout: default
+title: Certifications
+description: Certifications and courses in blockchain, data science, machine learning, and web and mobile development.
+permalink: /certifications/
+---
+{%- assign groups = site.data.certifications | group_by: "group" -%}
+
+<div class="wrap">
+  <div class="page-head">
+    <span class="eyebrow">Credentials</span>
+    <h1>Certifications</h1>
+    <p class="lede">{{ site.data.certifications | size }} certificates across blockchain, data science,
+    machine learning and application development. Where a public verification link exists it is on
+    the entry.</p>
+  </div>
+
+  {%- for group in groups -%}
+  <section class="section" style="padding-top:0">
+    <div class="section__head"><h2>{{ group.name }}</h2></div>
+    <ul class="items">
+      {%- for c in group.items -%}
+      <li class="item">
+        <div class="item__head">
+          <div>
+            <h3 class="item__title">{{ c.title }}{% if c.award %} <span class="tag">{{ c.award }}</span>{% endif %}</h3>
+            <p class="item__sub">{{ c.issuer }}{% if c.via %} · via {{ c.via }}{% endif %}</p>
+          </div>
+          <span class="item__year">{{ c.date }}</span>
+        </div>
+        {%- if c.detail %}<p class="item__body">{{ c.detail }}</p>{% endif %}
+        {%- if c.verify or c.file %}
+        <p class="item__body" style="margin-top:0.6rem">
+          {%- if c.verify %}<a href="{{ c.verify }}" rel="noopener">Verify {% include icon.html name="external" %}</a>{% endif -%}
+          {%- if c.verify and c.file %} · {% endif -%}
+          {%- if c.file %}<a href="{{ c.file | relative_url }}">Certificate {% include icon.html name="download" %}</a>{% endif -%}
+        </p>
+        {%- endif %}
+      </li>
+      {%- endfor -%}
+    </ul>
+  </section>
+  {%- endfor -%}
+</div>

@@ -1,0 +1,41 @@
+{%- comment -%}
+  Read-only archive of comments carried over from Blogspot. Nothing is stored
+  or fetched at runtime — the comments live in the post's own front matter, so
+  they are just as durable as the post itself.
+
+  Front matter shape:
+    comments:
+      - author: Name
+        author_url: https://...      # optional
+        date: 2014-03-19 10:22:00 +0500
+        content: |
+          The comment body, as plain text or simple HTML.
+{%- endcomment -%}
+{%- if page.comments and page.comments.size > 0 -%}
+<section class="comments{% if page.dir == 'rtl' %} rtl{% endif %}" aria-labelledby="comments-heading">
+  <h2 id="comments-heading" class="comments__heading">
+    {{ page.comments | size }} comment{% if page.comments.size != 1 %}s{% endif %}
+  </h2>
+  <p class="comments__note">
+    Carried over from Blogspot when this post moved here. New comments are closed —
+    {% include site-vars.html %}<a href="mailto:{{ site_email }}">email me</a> instead.
+  </p>
+  <ol class="comments__list">
+    {%- for c in page.comments -%}
+    <li class="comment">
+      <div class="comment__meta">
+        <span class="comment__author">
+          {%- if c.author_url -%}
+          <a href="{{ c.author_url }}" rel="nofollow noopener">{{ c.author }}</a>
+          {%- else -%}
+          {{ c.author | default: "Anonymous" }}
+          {%- endif -%}
+        </span>
+        {%- if c.date %}<time datetime="{{ c.date | date_to_xmlschema }}">{{ c.date | date: "%d %b %Y" }}</time>{% endif -%}
+      </div>
+      <div class="comment__body">{{ c.content | markdownify }}</div>
+    </li>
+    {%- endfor -%}
+  </ol>
+</section>
+{%- endif -%}

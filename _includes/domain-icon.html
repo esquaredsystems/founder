@@ -1,0 +1,27 @@
+{%- comment -%}
+  Picks a domain icon for a project from its tags, so the project grid reads
+  visually instead of as blocks of prose. No per-project configuration needed —
+  add a `domain` column value in projects.csv to override the guess.
+
+  Usage: {% include domain-icon.html project=project %}
+{%- endcomment -%}
+{%- assign proj = include.project -%}
+{%- assign tagline = proj.tags | downcase -%}
+
+{%- if proj.domain -%}
+  {%- assign domain = proj.domain -%}
+{%- elsif tagline contains "web3" or tagline contains "blockchain" or tagline contains "gpu" -%}
+  {%- assign domain = "chain" -%}
+{%- elsif tagline contains "health" or tagline contains "tuberculosis" or tagline contains "screening" or tagline contains "immunis" or tagline contains "medical" or tagline contains "mdr-tb" -%}
+  {%- assign domain = "health" -%}
+{%- elsif tagline contains "data warehouse" or tagline contains "etl" or tagline contains "machine learning" or tagline contains "deep learning" or tagline contains "analytics" or tagline contains "network" -%}
+  {%- assign domain = "chart" -%}
+{%- elsif tagline contains "chatbot" or tagline contains "nlp" or tagline contains "messaging" or tagline contains "marketing" -%}
+  {%- assign domain = "message" -%}
+{%- elsif tagline contains "education" -%}
+  {%- assign domain = "book" -%}
+{%- else -%}
+  {%- assign domain = "server" -%}
+{%- endif -%}
+
+<span class="card__domain" aria-hidden="true">{% include icon.html name=domain %}</span>

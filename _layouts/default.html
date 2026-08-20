@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+{%- comment -%}
+  The site chrome (header, footer) stays LTR even on Urdu pages — the nav is in
+  English and flipping the whole layout gains nothing. Direction is applied to
+  the article body instead, via the `rtl` class in the bazm layout.
+{%- endcomment -%}
+<html lang="{{ page.lang | default: 'en' }}">
+<head>
+  {% include head.html %}
+</head>
+<body>
+  {% include header.html %}
+  <main id="main">
+    {{ content }}
+  </main>
+  {% include footer.html %}
+</body>
+</html>

@@ -1,0 +1,31 @@
+{%- comment -%}
+  Turns _data/profile.csv (a key/value sheet) into plain Liquid variables.
+
+  Include this once at the TOP of any page or layout that needs them. Variables
+  assigned inside an include stay visible to whatever included it, but a layout
+  renders after its page, so a page cannot inherit these from its layout — each
+  file that needs them includes this itself.
+
+  Adding a field: add a row to profile.csv, then one `assign` line here.
+{%- endcomment -%}
+{%- assign _p = site.data.profile -%}
+
+{%- assign site_name       = _p | where: "key", "name"        | first | map: "value" | first -%}
+{%- assign site_short_name = _p | where: "key", "short_name"  | first | map: "value" | first -%}
+{%- assign site_tagline    = _p | where: "key", "tagline"     | first | map: "value" | first -%}
+{%- assign site_role       = _p | where: "key", "role"        | first | map: "value" | first -%}
+{%- assign site_blurb      = _p | where: "key", "blurb"       | first | map: "value" | first -%}
+{%- assign site_location   = _p | where: "key", "location"    | first | map: "value" | first -%}
+{%- assign site_email      = _p | where: "key", "email"       | first | map: "value" | first -%}
+{%- assign site_email_alt  = _p | where: "key", "email_alt"   | first | map: "value" | first -%}
+{%- assign site_phone      = _p | where: "key", "phone"       | first | map: "value" | first -%}
+{%- assign site_portrait   = _p | where: "key", "portrait"    | first | map: "value" | first -%}
+{%- assign site_portrait2x = _p | where: "key", "portrait_2x" | first | map: "value" | first -%}
+
+{%- assign countries_label     = _p | where: "key", "countries_label"      | first | map: "value" | first -%}
+{%- assign teaching_intro          = _p | where: "key", "teaching_intro"          | first | map: "value" | first -%}
+
+{%- comment -%} Slices of links.csv, by kind. {%- endcomment -%}
+{%- assign site_links       = site.data.links | where: "kind", "link" -%}
+{%- assign site_blogs       = site.data.links | where: "kind", "blog" -%}
+{%- assign site_memberships = site.data.links | where: "kind", "membership" -%}

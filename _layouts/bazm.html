@@ -1,0 +1,40 @@
+---
+layout: default
+---
+{%- comment -%}
+  Layout for the Urdu literary blog. The article body is RTL and set in
+  Nastaliq; the surrounding site chrome stays LTR. Posts that are actually in
+  English (there are a few) can set `dir: ltr` and `lang: en` in their front
+  matter to opt out.
+{%- endcomment -%}
+{%- assign is_rtl = false -%}
+{%- if page.dir == 'rtl' %}{% assign is_rtl = true %}{% endif -%}
+
+<div class="wrap">
+  <article>
+    <div class="page-head prose">
+      <span class="eyebrow">
+        <a href="{{ '/bazm/' | relative_url }}">بزمِ انجم</a> ·
+        <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%d %B %Y" }}</time>
+        {%- if page.tags and page.tags.size > 0 %} · {{ page.tags | join: " · " }}{% endif -%}
+      </span>
+      <h1{% if is_rtl %} class="urdu" dir="rtl" lang="ur"{% endif %}>{{ page.title }}</h1>
+      {%- if page.subtitle %}<p class="lede{% if is_rtl %} urdu{% endif %}"{% if is_rtl %} dir="rtl"{% endif %}>{{ page.subtitle }}</p>{% endif -%}
+    </div>
+
+    <div class="prose post-body{% if is_rtl %} rtl urdu{% endif %}"{% if is_rtl %} dir="rtl" lang="ur"{% endif %}>
+      {{ content }}
+    </div>
+  </article>
+
+  <div class="prose">
+    {% include comments.html %}
+
+    <nav class="post-nav" aria-label="Post navigation">
+      <span><a href="{{ '/bazm/' | relative_url }}">← تمام تحریریں</a></span>
+      {%- if page.source_url %}
+      <span><a href="{{ page.source_url }}" rel="noopener">Original on Blogspot {% include icon.html name="external" %}</a></span>
+      {%- endif %}
+    </nav>
+  </div>
+</div>

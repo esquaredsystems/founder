@@ -1,3 +1,117 @@
-theme: jekyll-theme-minimal
-title: Owais's homepage
-description: Bookmark this to keep an eye on my project updates!
+# ---------------------------------------------------------------------------
+# Site settings
+# ---------------------------------------------------------------------------
+# NOTE ON URLs
+# This repo sits under the `esquaredsystems` organisation, so GitHub Pages
+# serves it as a *project* page at:
+#     https://esquaredsystems.github.io/owaishussain.github.io/
+#
+# If you ever attach a custom domain (e.g. owaishussain.com) or move the repo
+# to a personal account named `owaishussain`, change the two lines below to:
+#     url: "https://owaishussain.com"     (or https://owaishussain.github.io)
+#     baseurl: ""
+# ---------------------------------------------------------------------------
+
+title: Owais A. Hussain
+tagline: I make fairy tales out of data
+description: >-
+  Personal site of Owais A. Hussain — PhD in data mining, 17+ years building
+  software for healthcare, education and emerging tech. Research in influence
+  mining, machine learning and health informatics.
+
+url: "https://esquaredsystems.github.io"
+baseurl: "/owaishussain.github.io"
+
+# ---------------------------------------------------------------------------
+# Build
+# ---------------------------------------------------------------------------
+markdown: kramdown
+highlighter: rouge
+permalink: /writing/:year/:month/:title/
+timezone: Asia/Karachi
+
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+  hard_wrap: false
+
+sass:
+  style: compressed
+
+# No plugins are required — the site is deliberately plugin-free so it builds
+# identically on GitHub Pages, on any Jekyll version, and offline.
+plugins: []
+
+# ---------------------------------------------------------------------------
+# Collections
+# ---------------------------------------------------------------------------
+collections:
+  projects:
+    output: true
+    permalink: /projects/:name/
+  # The Urdu literary blog, migrated from bazmeanjum.blogspot.com.
+  # Change `/bazm/` here and in the nav below to rename the section.
+  bazm:
+    output: true
+    permalink: /bazm/:name/
+
+defaults:
+  - scope:
+      path: ""
+      type: posts
+    values:
+      layout: post
+  - scope:
+      path: ""
+      type: projects
+    values:
+      layout: project
+  - scope:
+      path: ""
+      type: bazm
+    values:
+      layout: bazm
+      lang: ur
+      dir: rtl
+  - scope:
+      path: ""
+    values:
+      layout: page
+
+# ---------------------------------------------------------------------------
+# Navigation (edit to add/remove top-nav items)
+# ---------------------------------------------------------------------------
+nav:
+  - title: Projects
+    url: /projects/
+  - title: Research
+    url: /research/
+  - title: Teaching
+    url: /teaching/
+  - title: Certifications
+    url: /certifications/
+  # A nav item with `children` becomes a dropdown. The parent still links to
+  # its own url; the children appear on hover, focus or tap.
+  - title: Writing
+    url: /writing/
+    children:
+      - title: Notes
+        url: /writing/
+        note: Technology, data and teaching
+      - title: بزمِ انجم
+        url: /bazm/
+        lang: ur
+        note: Urdu poetry and prose
+  - title: About
+    url: /about/
+
+exclude:
+  - README.md
+  - CONTENT-GUIDE.md
+  - tools
+  - LICENSE
+  - Gemfile
+  - Gemfile.lock
+  - vendor
+  - .sass-cache
+  - .jekyll-cache

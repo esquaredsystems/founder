@@ -1,0 +1,41 @@
+{% include site-vars.html %}
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <h4>{{ site_name }}</h4>
+        <p class="faint" style="margin:0">{{ site_location }}<br>
+        <a href="mailto:{{ site_email }}">{{ site_email }}</a></p>
+      </div>
+      <div>
+        <h4>Site</h4>
+        <ul>
+          {%- for item in site.nav -%}
+          <li><a href="{{ item.url | relative_url }}">{{ item.title }}</a></li>
+          {%- endfor -%}
+        </ul>
+      </div>
+      <div>
+        <h4>Elsewhere</h4>
+        <ul>
+          {%- for link in site_links -%}
+          <li><a href="{{ link.url }}" rel="me noopener">{{ link.name }}</a></li>
+          {%- endfor -%}
+        </ul>
+      </div>
+      <div>
+        <h4>Blogs</h4>
+        <ul>
+          {%- for blog in site_blogs -%}
+          <li><a href="{{ blog.url }}" rel="noopener"{% if blog.extra2 == 'ur' %} class="urdu"{% endif %}>{{ blog.name }}</a></li>
+          {%- endfor -%}
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© {{ 'now' | date: "%Y" }} {{ site_name }}</span>
+      <span>Built with Jekyll · <a href="https://github.com/esquaredsystems/owaishussain.github.io">Source</a> · <a href="{{ '/feed.xml' | relative_url }}">RSS</a></span>
+    </div>
+  </div>
+</footer>
+<script src="{{ '/assets/js/site.js' | relative_url }}" defer></script>
