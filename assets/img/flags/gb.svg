@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" id="flag-icons-gb" viewBox="0 0 640 480">
+  <path fill="#012169" d="M0 0h640v480H0z"/>
+  <path fill="#fff" d="m0 0 320 240L0 480h71l284.5-213.4L640 480v-53.3L391.3 240 640 53.3V0h-71L320 213.4 71 0H0z"/>
+  <path fill="#c8102e" d="m0 0 320 240L0 480v-35.5L272.7 240 0 35.5V0zm640 0L320 240l320 240v-35.5L367.3 240 640 35.5V0z"/>
+  <path fill="#fff" d="M267 0h106v480H267zM0 187h640v106H0z"/>
+  <path fill="#c8102e" d="M284 0h72v480h-72zM0 204h640v72H0z"/>
+</svg>

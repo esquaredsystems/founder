@@ -30,6 +30,9 @@
 <title>{{ page_title }}</title>
 <meta name="description" content="{{ page_desc | strip_newlines | strip | escape }}">
 <meta name="author" content="{{ site_name }}">
+{%- if page.published == false %}
+<meta name="robots" content="noindex,nofollow">
+{%- endif %}
 <link rel="canonical" href="{{ canonical }}">
 
 <meta property="og:type" content="{% if page.layout == 'post' %}article{% else %}website{% endif %}">

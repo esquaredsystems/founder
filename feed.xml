@@ -8,13 +8,14 @@ permalink: /feed.xml
   <subtitle>{{ site.description | strip_newlines | strip | xml_escape }}</subtitle>
   <link href="{{ '/feed.xml' | absolute_url }}" rel="self" type="application/atom+xml"/>
   <link href="{{ '/' | absolute_url }}" rel="alternate" type="text/html"/>
-  <updated>{% if site.posts.first %}{{ site.posts.first.date | date_to_xmlschema }}{% else %}{{ site.time | date_to_xmlschema }}{% endif %}</updated>
+  {%- include all-posts.html -%}
+  <updated>{% if all_posts.first %}{{ all_posts.first.date | date_to_xmlschema }}{% else %}{{ site.time | date_to_xmlschema }}{% endif %}</updated>
   <id>{{ '/' | absolute_url | xml_escape }}</id>
   {% include site-vars.html %}<author>
     <name>{{ site_name | xml_escape }}</name>
     <email>{{ site_email | xml_escape }}</email>
   </author>
-  {%- for post in site.posts limit: 20 %}
+  {%- for post in all_posts limit: 20 %}
   <entry>
     <title type="html">{{ post.title | xml_escape }}</title>
     <link href="{{ post.url | absolute_url }}" rel="alternate" type="text/html"/>

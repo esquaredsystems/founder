@@ -1,0 +1,41 @@
+{%- comment -%}
+  Shared post listing, newest first. Used by /writing/ and by each category page.
+
+  Pass a category slug to filter:  {% include post-list.html category="poetry" %}
+  Omit it to list everything.
+{%- endcomment -%}
+{%- include all-posts.html -%}
+{%- if include.category -%}
+  {%- assign posts = all_posts | where: "category", include.category -%}
+{%- else -%}
+  {%- assign posts = all_posts -%}
+{%- endif -%}
+
+{%- if posts.size > 0 -%}
+<ul class="items">
+  {%- for post in posts -%}
+  {%- assign cat = site.data.categories | where: "slug", post.category | first -%}
+  {%- assign rtl = false -%}
+  {%- if post.dir == 'rtl' %}{% assign rtl = true %}{% endif -%}
+  <li class="item">
+    <div class="item__head">
+      <div>
+        <h2 class="item__title{% if rtl %} urdu{% endif %}"{% if rtl %} dir="rtl" lang="ur"{% endif %}>
+          <a href="{{ post.url | relative_url }}">{{ post.title }}</a>{% if post.published == false %} <span class="tag tag--draft">Unpublished</span>{% endif %}
+        </h2>
+        <p class="item__sub">
+          <time datetime="{{ post.date | date_to_xmlschema }}">{% if post.date_display %}{{ post.date_display }}{% else %}{{ post.date | date: "%-d %B %Y" }}{% endif %}</time>
+          {%- if cat and include.category == nil %} · <a href="{{ '/writing/' | append: cat.slug | append: '/' | relative_url }}">{{ cat.name }}</a>{% endif -%}
+          {%- if post.tags and post.tags.size > 0 %} · {{ post.tags | join: ", " }}{% endif -%}
+        </p>
+      </div>
+    </div>
+    {%- if post.description %}
+    <p class="item__body{% if rtl %} urdu rtl{% endif %}"{% if rtl %} dir="rtl" lang="ur"{% endif %}>{{ post.description }}</p>
+    {%- endif %}
+  </li>
+  {%- endfor -%}
+</ul>
+{%- else -%}
+<p class="muted">Nothing here yet.</p>
+{%- endif -%}

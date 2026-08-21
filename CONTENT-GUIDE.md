@@ -26,6 +26,7 @@ GitHub web editor. Read the encoding note at the bottom before using Excel.
 | `papers.csv` | The Research page and the research block on the home page |
 | `projects.csv` | The Projects page and the project cards |
 | `teaching.csv` | Course outlines on the Teaching page |
+| `_courses/` | Lecture files linked under their matching Teaching course |
 | `grades.csv` | The grade distribution chart at the bottom of Teaching |
 | `certifications.csv` | The Certifications page |
 | `timeline.csv` | The career strip across the home page |
@@ -80,40 +81,137 @@ python3 tools/build_world_map.py package/countries-110m.json
 
 ### Blog posts
 
-Prose belongs in files, not cells.
+One piece, one file in `_writing/`, one page. Every piece uses the same
+template — `_layouts/post.html` — which reads the front matter and handles the
+rest.
 
-**English** — create `_posts/YYYY-MM-DD-a-short-slug.md`:
+**Filename:** `YYYY-MM-DD.html` — just the date. Use `.md` instead if you want
+to write the body in Markdown; `.html` is the right choice for verse. Two pieces
+on the same day need something to tell them apart: add anything after the date,
+e.g. `2015-06-26-b.html`. The filename is never seen by anyone — `permalink:`
+sets the URL.
 
-```markdown
+> **Why `_writing/` and not `_posts/`.** Jekyll only accepts a file in `_posts/`
+> if it is named `YYYY-MM-DD-slug.ext`. Shorten it to `2015-06-26.html` and
+> Jekyll stops treating it as a post at all — skipped, with no error and no
+> warning, and the piece silently vanishes. A collection has no such rule, so
+> writing lives in `_writing/` and the redundant slug is gone. Everything else
+> behaves the same.
+
+**Front matter:**
+
+```yaml
 ---
 title: What I learned porting Bahmni to three clinics
-description: One sentence used in previews, search results and the RSS feed.
+date: 2026-03-14
+permalink: /writing/2026/march/bahmni-sync/
+category: technology          # poetry | technology | travel | misc
+description: One line, used in previews, search results and the RSS feed.
 tags: [health informatics, distributed systems]
 ---
-
-Write in markdown. Only `title` is required.
 ```
 
-**Urdu** — create `_bazm/a-slug.html`:
+For an Urdu post, add two more lines:
 
-```html
----
-title: عنوان
-date: 2026-08-20 10:00:00 +0500
+```yaml
 lang: ur
 dir: rtl
----
+```
 
-<div class="poem">
-پہلا مصرع
-دوسرا مصرع
+That switches the article body to right-to-left and Nastaliq. The site header
+and footer stay left-to-right, and mixed-language lists stay aligned on one
+edge, so an Urdu title does not drift to the far side of the column.
+
+**Sorting** is by `date`, newest first, everywhere — the writing index, each
+category page, the home page and the feed. Nothing else to maintain.
+
+#### Unpublished posts
+
+Add one line to the front matter and the post stays off the site:
+
+```yaml
+published: false
+```
+
+`published` is Jekyll's own front-matter key, not something bolted on here, and
+it is absolute: the post is dropped before the site is even assembled. No page
+is written, so there is no URL to leak; it is absent from the writing index,
+every category page and their counts, the home page, the RSS feed, the sitemap
+and the neighbouring posts' ← → links. Nothing has to remember to filter it out,
+which is exactly why this is better than a flag that only hides things.
+
+To publish, set `published: true` or just delete the line. Anything without the
+key is published — that is the default.
+
+**To read one while you are working on it**, add `--unpublished` to the serve
+command:
+
+```bash
+bundle exec jekyll serve --livereload --baseurl "" --unpublished
+```
+
+That builds unpublished posts too. They appear in the listing with a yellow
+`UNPUBLISHED` badge, and the post itself carries a banner saying it is not on
+the live site. The flag is local only — GitHub Pages never sees it, so there is
+no way to leave it on by accident.
+
+**Why `permalink` is set per post.** Jekyll has no placeholder for a month's
+name, only its number. Spelling the month out means writing the URL by hand:
+`/writing/2007/august/ghazal/`. Get it wrong and the page still builds, it just
+lives at an odd address — so it is worth a glance.
+
+**Categories** live in `_data/categories.csv` (`slug`, `name`, `name_ur`,
+`description`). Adding a fifth category means adding a row there, a page under
+`writing/` copied from an existing one, and an entry in the `nav:` dropdown in
+`_config.yml`.
+
+#### Verse
+
+Poetry posts get a centred composition — eyebrow, title and poem share one
+axis. There are exactly two classes to remember: `.verse` wraps the poem and
+`.stanza` wraps each unit of it. A unit is a couplet in a ghazal, a band in a
+musaddas, a paragraph in free verse — whatever the form makes it. Put a `<br>`
+between lines inside a stanza and a blank line between stanzas:
+
+```html
+<div class="verse">
+  <p class="stanza">پہلا مصرع<br>
+  دوسرا مصرع</p>
+
+  <p class="stanza">پہلا مصرع<br>
+  دوسرا مصرع</p>
 </div>
 ```
 
-`dir: rtl` switches the article body to right-to-left and Nastaliq; the site
-header and footer stay left-to-right. Wrap verse in `<div class="poem">` — that
-preserves line breaks exactly as typed and centres the couplets, where an
-ordinary markdown paragraph would collapse them and ruin the poem.
+The lines inside a stanza are separated by line-height; stanzas are separated
+by margin. Keeping those independent is the entire point — if both gaps look
+the same, the poem reads as a flat list of lines instead of a sequence of
+ashaar.
+
+Four optional marks, all used by existing posts:
+
+| Class | What it is for | Example |
+|---|---|---|
+| `verse__letter` | the letter heading an acrostic stanza | `رمضان` |
+| `verse__label` | a section divider inside a poem | `گرہ` in *عروج لکھنا* |
+| `stanza--quote` | a stanza that quotes rather than says | the hadith in *وضو* |
+| `verse__cite` | a source line under the stanza it belongs to | `المائدہ ۔ ۶` |
+
+`verse__cite` goes *inside* the stanza it refers to, not after it, so the
+spacing between stanzas stays even:
+
+```html
+<p class="stanza stanza--quote">پہلا مصرع<br>
+دوسرا مصرع
+<span class="verse__cite">صحیح مسلم ۔ کتاب الطہارۃ</span></p>
+```
+
+Do not put verse in a plain markdown paragraph. Markdown collapses single line
+breaks, which turns a poem into prose. This is why poems are `.html` files.
+
+A dedication or a note about when the piece was written goes in `source_note:`
+in the front matter, not in the body — it is set apart from the poem
+automatically.
 
 ### Project write-ups
 
@@ -157,13 +255,12 @@ own page, and the children appear on hover, on keyboard focus, or on tap:
   - title: Writing
     url: /writing/
     children:
-      - title: Notes
+      - title: All posts
         url: /writing/
-        note: Technology, data and teaching
-      - title: بزمِ انجم
-        url: /bazm/
-        lang: ur
-        note: Urdu poetry and prose
+        note: Everything, newest first
+      - title: Poetry
+        url: /writing/poetry/
+        note: غزل، نظم اور دیگر کلام
 ```
 
 `note` is the small grey line under each entry, and `lang: ur` switches that

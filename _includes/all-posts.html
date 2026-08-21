@@ -1,0 +1,17 @@
+{%- comment -%}
+  Assigns `all_posts` — everything in `_writing/`, newest first.
+
+  Writing lives in a collection rather than `_posts/` so that a filename can be
+  just its date (see the note in _config.yml). The one cost is that Jekyll
+  sorts a collection OLDEST first, so it has to be reversed exactly once, here.
+
+  Use this everywhere instead of `site.writing`:
+
+      {% include all-posts.html %}
+      {% for post in all_posts %} ... {% endfor %}
+
+  Unpublished pieces (`published: false`) are already gone by this point —
+  Jekyll drops them before the site is assembled — so nothing here has to
+  filter for them.
+{%- endcomment -%}
+{%- assign all_posts = site.writing | reverse -%}

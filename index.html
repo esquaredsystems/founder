@@ -66,7 +66,7 @@ layout: default
 <section class="section">
   <div class="wrap">
     <div class="section__head">
-      <h2>Geographical footprint</h2>
+      <h2>Where I've been</h2>
     </div>
     {% include countries.html %}
   </div>
@@ -133,11 +133,39 @@ layout: default
   </div>
 </section>
 
+{%- include all-posts.html -%}
+{%- if all_posts.size > 0 -%}
 <section class="section">
   <div class="wrap">
-    <div>
+    <div class="section__head">
+      <h2>Writing</h2>
+      <a href="{{ '/writing/' | relative_url }}">All posts {% include icon.html name="arrow" %}</a>
+    </div>
+    <div class="card-grid">
+      {%- for post in all_posts limit: 3 -%}
+      {%- assign pcat = site.data.categories | where: "slug", post.category | first -%}
+      {%- assign prtl = false -%}{%- if post.dir == 'rtl' %}{% assign prtl = true %}{% endif -%}
+      <a class="card" href="{{ post.url | relative_url }}">
+        <span class="card__meta">
+          <span>{{ pcat.name | default: "Writing" }}</span>
+          <span><time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%b %Y" }}</time></span>
+        </span>
+        <h3 class="card__title{% if prtl %} urdu{% endif %}"{% if prtl %} dir="rtl" lang="ur"{% endif %}>{{ post.title }}</h3>
+        <p class="card__body{% if prtl %} urdu rtl{% endif %}"{% if prtl %} dir="rtl" lang="ur"{% endif %}>{{ post.description | default: post.excerpt | strip_html | truncate: 140 }}</p>
+      </a>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+{%- endif -%}
+
+<section class="section section--soft">
+  <div class="wrap">
+    <div class="callout prose">
       <h2 style="margin-top:0">Open to collaborate</h2>
-      <p>I want to bridge the gap between academia and industry. If you are working on social problems that software and data can help with, I would like to hear about it.</p>
+      <p>I want to bridge the gap between academia and industry. If you are working on
+      social problems that software and data can help with — public health, education,
+      influence in networks, decentralised systems — I would like to hear about it.</p>
       <p style="margin-top:1.2rem">
         <a class="btn btn--primary" href="mailto:{{ site_email }}">{% include icon.html name="mail" %} {{ site_email }}</a>
       </p>

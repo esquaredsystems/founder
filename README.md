@@ -20,12 +20,17 @@ _data/                   ALL structured content, as CSV. Edit and commit.
   profile.csv  links.csv  countries.csv  companies.csv
   education.csv  skills.csv  papers.csv  projects.csv
   teaching.csv  grades.csv  certifications.csv  timeline.csv
+  categories.csv
 _projects/               optional write-up per project; metadata lives in
                          projects.csv           -> /projects/<name>/
-_posts/                  English blog posts     -> /writing/YYYY/MM/<slug>/
-_bazm/                   Urdu blog posts        -> /bazm/<slug>/
-_layouts/                default, page, post, project, bazm
-_includes/               head, header, footer, icon, countries, world-map.svg
+_writing/                every piece of writing, any language. Files are
+                         named just YYYY-MM-DD.html; `permalink:` in the
+                         front matter sets the actual URL.
+                         -> /writing/YYYY/<month>/<slug>/
+writing/                 one page per category  -> /writing/<category>/
+_layouts/                default, page, post, project
+_includes/               head, header, footer, icon, countries, post-list,
+                         category-nav, all-posts, world-map.svg
 assets/
   css/style.css          the whole stylesheet — design tokens at the top
   js/site.js             dark-mode toggle and the map hover
@@ -33,7 +38,7 @@ assets/
   files/certificates/    certificate PDFs and images
 index.html               home page
 about.md  projects.html  research.html  teaching.html
-certifications.html  writing.html  bazm.html  404.html
+certifications.html  writing.html  404.html
 feed.xml  sitemap.xml    hand-written, so no plugins are needed
 ```
 
@@ -43,8 +48,10 @@ Two content patterns, used deliberately:
   countries, skills, the timeline. Jekyll reads CSV out of `_data/` natively, so
   there is no converter, no build step of our own, and nothing to install. Edit
   in Excel, Sheets or a text editor; commit; done.
-- **Collections** (`_posts/`, `_bazm/`, and `_projects/*.md`) for prose. Writing
-  belongs in files, not spreadsheet cells.
+- **Collections** (`_writing/` and `_projects/`) for prose. Writing belongs in
+  files, not spreadsheet cells. Writing is a collection rather than `_posts/`
+  because `_posts/` forces a slug into every filename; see the note in
+  `_config.yml`.
 
 The whole repo has no dependency beyond Jekyll itself, which GitHub provides.
 Nothing in the deployment path can rot.
@@ -76,13 +83,18 @@ You do not need this to publish — but if you want a preview before pushing:
 ```bash
 gem install bundler
 bundle install          # first time only, a few minutes
-bundle exec jekyll serve --livereload --baseurl ""
+bundle exec jekyll serve --livereload --baseurl "" --unpublished
 ```
 
 Then open **http://localhost:4000/**
 
 Leave it running: every time you save a file the site rebuilds and the browser
 refreshes. Stop it with `Ctrl+C`.
+
+`--unpublished` builds posts marked `published: false` so you can read a piece
+while you are still working on it. They are clearly badged, and the flag is
+local only — GitHub Pages never sees it. Drop the flag to preview the site
+exactly as the world will get it.
 
 > Because there is a `Gemfile` in this folder, Jekyll insists on being launched
 > through Bundler. Always use `bundle exec jekyll serve`, not `jekyll serve` —

@@ -243,15 +243,21 @@ th {
   gap: 1rem;
   min-height: 62px;
 }
+/* The brand is a home icon. Sized and padded to a 40px target: an icon-only
+   link inherits the text size otherwise, which leaves a tap target under the
+   24px minimum. */
 .brand {
-  font-family: var(--font-display);
-  font-size: 1.06rem;
-  font-weight: 600;
-  letter-spacing: -0.01em;
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  margin-left: -0.5rem;
+  border-radius: 8px;
   color: var(--text);
-  white-space: nowrap;
+  flex: none;
 }
-.brand:hover { color: var(--accent); text-decoration: none; }
+.brand svg { width: 21px; height: 21px; }
+.brand:hover { color: var(--accent); background: var(--bg-soft); text-decoration: none; }
 
 .site-nav {
   margin-left: auto;
@@ -355,7 +361,6 @@ th {
 }
 
 @media (max-width: 680px) {
-  .brand { font-size: 0.95rem; }
   /* Scroll the nav horizontally, and hint that it scrolls. */
   .site-nav {
     overflow-x: auto;
@@ -534,6 +539,33 @@ a.card:hover {
   white-space: nowrap;
 }
 
+/* A post with `published: false` never reaches the live site. It appears only
+   in a local `--unpublished` build; the badge makes that unmistakable. */
+.tag--draft {
+  background: #fbe9c6;
+  color: #8a5a00;
+  text-transform: uppercase;
+  vertical-align: middle;
+}
+html[data-theme="dark"] .tag--draft { background: #4a3a12; color: #f0c761; }
+
+.draft-note {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0 0 2rem;
+  padding: 0.7rem 1rem;
+  border-radius: 10px;
+  border: 1px dashed #d8a93a;
+  background: #fdf6e6;
+  color: #7a5100;
+  font-size: 0.9rem;
+  text-align: left;
+}
+html[data-theme="dark"] .draft-note {
+  background: #322612; border-color: #7a5f22; color: #f0c761;
+}
+
 /* ------------------------------------------------------------- item list -- */
 .items { list-style: none; margin: 0; padding: 0; }
 .item {
@@ -584,6 +616,7 @@ a.card:hover {
   color: var(--text-faint);
   white-space: nowrap;
 }
+
 /* -------------------------------------------------------------- skill box -- */
 .skill-groups {
   display: grid;
@@ -694,6 +727,20 @@ a.card:hover {
 }
 .chip:hover { border-color: var(--accent); color: var(--accent); text-decoration: none; }
 .chip svg { width: 14px; height: 14px; }
+.chip--on {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+html[data-theme="dark"] .chip--on { color: #10201d; }
+.chip--on:hover { color: #fff; border-color: var(--accent); }
+html[data-theme="dark"] .chip--on:hover { color: #10201d; }
+.chip__count {
+  font-family: var(--font-mono);
+  font-size: 0.72em;
+  opacity: 0.65;
+  margin-left: 0.15rem;
+}
 
 /* ------------------------------------------------------------------ misc -- */
 .two-col {
@@ -733,6 +780,22 @@ details.course .course__body {
   font-size: 0.95rem;
   max-width: var(--prose);
 }
+details.course .course__materials-label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 1rem 0 0;
+  color: var(--text);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+details.course .course__materials-label svg { width: 1rem; height: 1rem; }
+details.course .course__files {
+  margin: 0.4rem 0 0;
+  padding-left: 1.2rem;
+  font-size: 0.9rem;
+}
+details.course .course__files li + li { margin-top: 0.25rem; }
 
 /* ----------------------------------------------------------------- hero -- */
 /* Two columns on wide screens: text left, portrait right. The portrait comes
@@ -1023,6 +1086,135 @@ h1.urdu, h2.urdu, h3.urdu {
   color: var(--text-faint);
   font-size: 0.9em;
   margin-bottom: 0.5rem;
+}
+
+/* Verse. A .verse holds a sequence of .stanza blocks — ashaar in a ghazal,
+   four-line bands in a murabba, whatever the form is. Each stanza is its own
+   block so the space *within* a stanza (line-height) is set independently of
+   the space *between* stanzas (margin). Keeping those two apart is the whole
+   typographic point: if they look the same, the poem reads as a flat list of
+   lines instead of a sequence of units. */
+.verse {
+  margin: 2.5rem 0;
+  text-align: center;
+}
+.verse .stanza {
+  margin: 0 0 2.6rem;
+  font-size: 1.2em;
+  line-height: 1.95;
+  text-wrap: balance;
+}
+.verse .stanza:last-child { margin-bottom: 0; }
+
+/* A separator between the last stanza and any dedication that follows. */
+.verse + .post-source,
+.prose > .verse + * .post-source { margin-top: 2.5rem; }
+
+/* A section label inside a poem — گرہ, بند, or a movement marker. */
+.verse__label {
+  font-family: var(--font-urdu);
+  font-size: 0.95rem;
+  color: var(--text-faint);
+  margin: 0 auto 1.8rem;
+  padding-top: 1.8rem;
+  border-top: 1px solid var(--border);
+  max-width: 9rem;
+}
+
+/* The letter heading an acrostic stanza. The letters read down the poem to
+   spell a word, so each is marked rather than left looking like a stray
+   character adrift above the verse. */
+.verse__letter {
+  display: block;
+  font-family: var(--font-urdu);
+  font-size: 1.45rem;
+  line-height: 1;
+  color: var(--accent);
+  margin-bottom: 0.8rem;
+}
+
+/* A stanza that closes on a repeated refrain — the last lines of a musaddas
+   band. Slightly set apart from the lines above it. */
+.verse .stanza--refrain { color: var(--text); }
+.verse .refrain { display: block; margin-top: 0.9rem; }
+
+/* A source reference sitting under the couplet it belongs to — a Quranic ayah
+   or a hadith. Set small and quiet so it reads as an attribution, not a line
+   of the poem. It is part of the preceding stanza, so the stanza's own bottom
+   margin still separates the couplets. */
+.verse__cite {
+  display: block;
+  margin-top: 0.5rem;
+  font-family: var(--font-urdu);
+  font-size: 0.72em;
+  line-height: 1.8;
+  color: var(--text-faint);
+}
+.verse__cite a { color: inherit; }
+
+/* A note to self standing in for a misra that is not written yet — the sense
+   of the line, held in place until the line arrives. Set in brackets and in
+   the body font rather than Nastaliq, so it is unmistakably scaffolding and
+   not verse. Only ever appears in a draft. */
+.verse__note {
+  font-family: var(--font-body);
+  font-size: 0.78em;
+  color: var(--text-faint);
+  font-style: italic;
+}
+
+/* A quoted couplet — a translated ayah or hadith carried in verse. Marked so
+   the reader can see it is being reported rather than said. */
+.verse .stanza--quote {
+  border-inline-start: 2px solid var(--accent-soft);
+  padding-inline-start: 1.1rem;
+  display: inline-block;
+  text-align: inherit;
+}
+
+.post-source {
+  color: var(--text-faint);
+  font-size: 0.85rem;
+  border-top: 1px solid var(--border);
+  padding-top: 1rem;
+  margin-top: 2.5rem;
+}
+
+.heading-alt {
+  color: var(--text-faint);
+  font-size: 0.62em;
+  margin-inline-start: 0.5rem;
+  white-space: nowrap;
+}
+
+/* Verse reads better as a centred composition than as a block pinned to the
+   left margin, so poetry posts centre their measure and their heading. */
+.prose--centred { margin-inline: auto; }
+.verse-head { text-align: center; }
+
+/* An Urdu heading still needs dir="rtl" for correct shaping and punctuation,
+   but aligning it right inside a 68ch measure strands it mid-page, away from
+   the eyebrow above it. Align it with everything else instead. */
+.page-head h1.urdu,
+.page-head .lede.urdu { text-align: left; }
+
+/* ...except on a verse page, where the whole head is centred with the poem.
+   Two classes on the same element, so this beats the rule above rather than
+   relying on source order. */
+.page-head.verse-head h1.urdu,
+.page-head.verse-head .lede.urdu,
+.page-head.verse-head h1,
+.page-head.verse-head .lede { text-align: center; }
+
+/* Same reasoning inside a post list, which mixes languages: keeping every
+   entry on one left edge stops Urdu titles from drifting to the far side of
+   the column. dir="rtl" is retained, so the text itself still shapes and
+   orders correctly. */
+.items .item__title.urdu,
+.items .item__body.urdu { text-align: left; }
+
+@media (max-width: 560px) {
+  .verse .stanza { font-size: 1.08em; line-height: 1.85; margin-bottom: 2rem; }
 }
 
 /* Latin text inside an RTL block (code, URLs, English words). */

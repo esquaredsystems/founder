@@ -1,0 +1,14 @@
+{%- comment -%}
+  The row of category chips shown above every post list. `active` is the slug of
+  the current category, or "all".
+{%- endcomment -%}
+<div class="chips" style="margin-bottom:2.2rem">
+  <a class="chip{% if include.active == 'all' %} chip--on{% endif %}" href="{{ '/writing/' | relative_url }}">All</a>
+  {%- include all-posts.html -%}
+  {%- for c in site.data.categories -%}
+  {%- assign count = all_posts | where: "category", c.slug | size -%}
+  <a class="chip{% if include.active == c.slug %} chip--on{% endif %}"
+     href="{{ '/writing/' | append: c.slug | append: '/' | relative_url }}">{{ c.name }}
+     <span class="chip__count">{{ count }}</span></a>
+  {%- endfor -%}
+</div>

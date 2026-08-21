@@ -1,47 +1,20 @@
 ---
 layout: default
 title: Writing
-description: Notes on data science, software engineering, teaching and Web3.
+description: Poetry, technology, travel and other notes — in English and Urdu.
 permalink: /writing/
 ---
 {% include site-vars.html %}
+{% include all-posts.html %}
 
 <div class="wrap">
   <div class="page-head">
     <span class="eyebrow">Notes</span>
     <h1>Writing</h1>
-    <p class="lede">Longer-form notes on data, engineering and teaching. <a href="{{ '/feed.xml' | relative_url }}">RSS</a>.</p>
+    <p class="lede">Poetry, technology, travel and whatever else. {{ all_posts | size }} pieces,
+    newest first. <a href="{{ '/feed.xml' | relative_url }}">RSS</a>.</p>
   </div>
 
-  {%- if site.posts.size > 0 -%}
-  <ul class="items">
-    {%- for post in site.posts -%}
-    <li class="item">
-      <div class="item__head">
-        <div>
-          <h2 class="item__title"><a href="{{ post.url | relative_url }}">{{ post.title }}</a></h2>
-          <p class="item__sub"><time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%d %B %Y" }}</time>{% if post.tags and post.tags.size > 0 %} · {{ post.tags | join: ", " }}{% endif %}</p>
-        </div>
-      </div>
-      <p class="item__body">{{ post.description | default: post.excerpt | strip_html | truncate: 220 }}</p>
-    </li>
-    {%- endfor -%}
-  </ul>
-  {%- else -%}
-  <p class="muted">No posts yet.</p>
-  {%- endif -%}
-
-  <section class="section">
-    <div class="section__head"><h2>Blogs I keep elsewhere</h2></div>
-    <div class="card-grid">
-      {%- for blog in site_blogs -%}
-      <a class="card" href="{{ blog.url }}" rel="noopener">
-        <span class="card__meta"><span>Blogspot</span><span>{{ blog.extra2 | upcase }}</span></span>
-        <h3 class="card__title{% if blog.extra2 == 'ur' %} urdu{% endif %}">{{ blog.name }}</h3>
-        <p class="card__body">{{ blog.extra }}</p>
-        <span class="card__foot faint" style="font-size:0.85rem">Visit →</span>
-      </a>
-      {%- endfor -%}
-    </div>
-  </section>
+  {% include category-nav.html active="all" %}
+  {% include post-list.html %}
 </div>

@@ -1,0 +1,20 @@
+---
+layout: default
+title: Travel
+description: Notes from the road.
+permalink: /writing/travel/
+---
+{%- assign cat = site.data.categories | where: "slug", "travel" | first -%}
+{%- include all-posts.html -%}
+{%- assign posts = all_posts | where: "category", "travel" -%}
+
+<div class="wrap">
+  <div class="page-head">
+    <span class="eyebrow"><a href="{{ '/writing/' | relative_url }}">Writing</a></span>
+    <h1>{{ cat.name }}{% if cat.name_ur %} <span class="urdu heading-alt" dir="rtl" lang="ur">{{ cat.name_ur }}</span>{% endif %}</h1>
+    <p class="lede">{{ cat.description }} — {{ posts | size }} piece{% if posts.size != 1 %}s{% endif %}.</p>
+  </div>
+
+  {% include category-nav.html active="travel" %}
+  {% include post-list.html category="travel" %}
+</div>

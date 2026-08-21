@@ -11,7 +11,8 @@ permalink: /sitemap.xml
   </url>
   {%- endunless %}
   {%- endfor %}
-  {%- for post in site.posts %}
+  {%- include all-posts.html -%}
+  {%- for post in all_posts %}
   <url>
     <loc>{{ post.url | absolute_url | xml_escape }}</loc>
     <lastmod>{{ post.date | date_to_xmlschema }}</lastmod>
@@ -20,11 +21,6 @@ permalink: /sitemap.xml
   {%- for project in site.projects %}
   <url>
     <loc>{{ project.url | absolute_url | xml_escape }}</loc>
-  </url>
-  {%- endfor %}
-  {%- for doc in site.bazm %}
-  <url>
-    <loc>{{ doc.url | absolute_url | xml_escape }}</loc>
   </url>
   {%- endfor %}
 </urlset>

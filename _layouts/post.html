@@ -1,26 +1,84 @@
 ---
 layout: default
 ---
+{%- comment -%}
+  The master template for every blog post, in any language and any category.
+
+  Front matter it responds to:
+    title       required
+    date        required — drives ordering (newest first) everywhere
+    category    poetry | technology | travel | misc   (see _data/categories.csv)
+    permalink   set per post so the month can be spelled out
+    lang / dir  set `lang: ur` and `dir: rtl` for Urdu; omitted means English LTR
+    description one line, used in previews, search results and the feed
+    tags        optional list
+    published   `published: false` keeps the post out of the build entirely —
+                no page, no URL, no listing. Preview it with
+                `bundle exec jekyll serve --unpublished`.
+{%- endcomment -%}
+{%- assign is_rtl = false -%}
+{%- if page.dir == 'rtl' %}{% assign is_rtl = true %}{% endif -%}
+{%- assign cat = site.data.categories | where: "slug", page.category | first -%}
+{%- comment -%} Verse is presented as a centred composition: eyebrow, title and
+   the poem share one axis. Prose keeps the usual left-aligned measure. {%- endcomment -%}
+{%- assign is_verse = false -%}
+{%- if page.category == "poetry" %}{% assign is_verse = true %}{% endif -%}
+
 <div class="wrap">
   <article>
-    <div class="page-head prose">
+    {%- if page.published == false %}
+    <div class="prose">
+      <p class="draft-note">{% include icon.html name="pen" %}<span><strong>Unpublished.</strong>
+      You are seeing this only because the site was built with
+      <code>--unpublished</code>. It is not on the live site at all — set
+      <code>published: true</code> in its front matter, or drop the line.</span></p>
+    </div>
+    {%- endif %}
+    <div class="page-head prose{% if is_verse %} prose--centred verse-head{% endif %}">
       <span class="eyebrow">
-        <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%d %B %Y" }}</time>
+        {%- if cat %}<a href="{{ '/writing/' | append: cat.slug | append: '/' | relative_url }}">{{ cat.name }}</a> · {% endif -%}
+        <time datetime="{{ page.date | date_to_xmlschema }}">{% if page.date_display %}{{ page.date_display }}{% else %}{{ page.date | date: "%-d %B %Y" }}{% endif %}</time>
         {%- if page.tags and page.tags.size > 0 %} · {{ page.tags | join: " · " }}{% endif -%}
       </span>
-      <h1>{{ page.title }}</h1>
-      {%- if page.subtitle %}<p class="lede">{{ page.subtitle }}</p>{% endif -%}
+      <h1{% if is_rtl %} class="urdu" dir="rtl" lang="ur"{% endif %}>{{ page.title }}</h1>
+      {%- if page.subtitle %}
+      <p class="lede{% if is_rtl %} urdu{% endif %}"{% if is_rtl %} dir="rtl" lang="ur"{% endif %}>{{ page.subtitle }}</p>
+      {%- endif %}
     </div>
 
-    <div class="prose post-body">
+    <div class="prose post-body{% if is_rtl %} rtl urdu{% endif %}{% if is_verse %} prose--centred{% endif %}"{% if is_rtl %} dir="rtl" lang="ur"{% endif %}>
       {{ content }}
     </div>
+
+    {%- if page.source_note %}
+    <div class="prose{% if is_verse %} prose--centred{% endif %}">
+      <p class="post-source{% if is_rtl %} urdu rtl{% endif %}{% if is_verse %} center{% endif %}"{% if is_rtl %} dir="rtl" lang="ur"{% endif %}>{{ page.source_note }}</p>
+    </div>
+    {%- endif %}
   </article>
 
   <div class="prose">
+    {% include comments.html %}
+
+    {%- comment -%}
+      `page.previous` / `page.next` are a `_posts` feature; a collection does
+      not get them, so the neighbours are found by walking `all_posts`. It runs
+      newest first, so the entry before this one is the newer piece and the
+      entry after it is the older. An unpublished piece is not in the list at
+      all, so it can never show up here.
+    {%- endcomment -%}
+    {%- include all-posts.html -%}
+    {%- assign older = nil -%}
+    {%- assign newer = nil -%}
+    {%- assign passed = false -%}
+    {%- for p in all_posts -%}
+      {%- if passed and older == nil %}{% assign older = p %}{% endif -%}
+      {%- if p.url == page.url %}{% assign passed = true %}{% endif -%}
+      {%- unless passed %}{% assign newer = p %}{% endunless -%}
+    {%- endfor -%}
     <nav class="post-nav" aria-label="Post navigation">
-      <span>{% if page.previous %}<a href="{{ page.previous.url | relative_url }}">← {{ page.previous.title }}</a>{% endif %}</span>
-      <span>{% if page.next %}<a href="{{ page.next.url | relative_url }}">{{ page.next.title }} →</a>{% endif %}</span>
+      <span>{% if older %}<a href="{{ older.url | relative_url }}">← {{ older.title }}</a>{% endif %}</span>
+      <span>{% if newer %}<a href="{{ newer.url | relative_url }}">{{ newer.title }} →</a>{% endif %}</span>
     </nav>
   </div>
 </div>

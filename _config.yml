@@ -27,6 +27,8 @@ baseurl: "/founder"
 # ---------------------------------------------------------------------------
 markdown: kramdown
 highlighter: rouge
+# Fallback only. Each piece sets its own `permalink:` so the month can be
+# spelled out — Jekyll has no month-name placeholder.
 permalink: /writing/:year/:month/:title/
 timezone: Asia/Karachi
 
@@ -42,6 +44,10 @@ sass:
 # identically on GitHub Pages, on any Jekyll version, and offline.
 plugins: []
 
+# Publish teaching materials stored in the underscore-prefixed course folder.
+include:
+  - _courses
+
 # ---------------------------------------------------------------------------
 # Collections
 # ---------------------------------------------------------------------------
@@ -49,16 +55,18 @@ collections:
   projects:
     output: true
     permalink: /projects/:name/
-  # The Urdu literary blog, migrated from bazmeanjum.blogspot.com.
-  # Change `/bazm/` here and in the nav below to rename the section.
-  bazm:
+
+  # ---------------------------------------------
+  # Jekyll only accepts a file in `_posts/` if it is named `YYYY-MM-DD-slug.ext`. 
+  # Drop the slug and Jekyll stops treating the file as a post at all. No error, no warning, the piece just disappears from site.
+  writing:
     output: true
-    permalink: /bazm/:name/
+    permalink: /writing/:name/
 
 defaults:
   - scope:
       path: ""
-      type: posts
+      type: writing
     values:
       layout: post
   - scope:
@@ -66,13 +74,6 @@ defaults:
       type: projects
     values:
       layout: project
-  - scope:
-      path: ""
-      type: bazm
-    values:
-      layout: bazm
-      lang: ur
-      dir: rtl
   - scope:
       path: ""
     values:
@@ -95,13 +96,21 @@ nav:
   - title: Writing
     url: /writing/
     children:
-      - title: Notes
+      - title: All posts
         url: /writing/
-        note: Technology, data and teaching
-      - title: بزمِ انجم
-        url: /bazm/
-        lang: ur
-        note: Urdu poetry and prose
+        note: Everything, newest first
+      - title: Poetry
+        url: /writing/poetry/
+        note: غزل، نظم اور دیگر کلام
+      - title: Technology
+        url: /writing/technology/
+        note: Software, data and teaching
+      - title: Travel
+        url: /writing/travel/
+        note: Notes from the road
+      - title: Miscellaneous
+        url: /writing/misc/
+        note: Everything else
   - title: About
     url: /about/
 

@@ -25,9 +25,24 @@ permalink: /teaching/
     <section style="margin-bottom:3rem">
       <h2 style="margin-bottom:0.5rem">{{ term.name }}</h2>
       {%- for course in term.items -%}
-      <details class="course">
+      {%- assign course_slug = course.course | slugify -%}
+      {%- case course_slug -%}
+        {%- when 'design-and-analysis-of-algorithms' -%}{%- assign course_slug = 'design-andanalysis-of-algorithms' -%}
+        {%- when 'mobile-application-development' -%}{%- assign course_slug = 'mobile-application-ddevelopment' -%}
+      {%- endcase -%}
+      {%- assign course_files = site.static_files | where_exp: "file", "file.path contains course_slug" -%}
+      <details class="course" open>
         <summary>{{ course.course }}</summary>
         <div class="course__body">{{ course.topics }}</div>
+        {%- if course_files.size > 0 %}
+        <p class="course__materials-label">{% include icon.html name="download" %} Course materials ({{ course_files.size }})</p>
+        <ul class="course__files">
+          {%- for file in course_files %}
+          {%- assign course_file_url = file.path | replace: site.source, '' -%}
+          <li><a href="{{ course_file_url | relative_url }}">{{ file.name }}</a></li>
+          {%- endfor %}
+        </ul>
+        {%- endif %}
       </details>
       {%- endfor -%}
     </section>
