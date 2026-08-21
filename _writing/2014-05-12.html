@@ -1,0 +1,42 @@
+---
+title: "Finally, a way to speed up Android emulator"
+date: 2014-05-12
+permalink: "/writing/2014/may/android-emulator-speed/"
+category: "technology"
+description: "Hardware virtualisation, and an Android emulator that is no longer painful."
+---
+
+<p>The Android emulator's speed is killer. Literally. Android developers know this; irrespective of platform you are using, Windows, Linux or Macintosh, and your hardware specification, the emulator provided with the Android's SDK crawls like a snail.</p>
+
+<p>Thankfully, the developers at ‎Intel® have come up with a hardware-assisted virtualization engine that uses the power of hardware virtualization to boost the performance of Android emulators. Here is how you can configure it:</p>
+
+<p>1. First, you need to enable Hardware Virtualization (VTx) technology from the BIOS settings on your computer. Since different vendors have different settings, you may have to search on the web on how to do so.</p>
+
+<p>2. Next, you need to download and install Android HAX Manager from Intel. During installation, you will be asked to reserve the amount of memory for HAX, keep it default (1024MB).</p>
+
+<p>3. Now go to your Android SDK directory and launch "SDK Manager.exe".</p>
+
+<p>4. Under Extras, check "Intel x86 Emulator Accelerator (HAXM installer)" and also select "Intel x86 Atom System Image" for your SDK version.</p>
+
+<figure class="post-figure">
+  <img src="{{ '/assets/img/writing/android-emulator-speed/01.png' | relative_url }}"
+       alt="" width="683" height="309" loading="lazy" decoding="async">
+</figure>
+
+<figure class="post-figure">
+  <img src="{{ '/assets/img/writing/android-emulator-speed/02.png' | relative_url }}"
+       alt="" width="677" height="306" loading="lazy" decoding="async">
+</figure>
+
+<p>5. Launch "AVD Manager.exe" from your Android SDK directory and create a new Virtual Device (AVD). Select Intel Atom (x86) for the CPU. You may just copy the settings from the image below.</p>
+
+<figure class="post-figure">
+  <img src="{{ '/assets/img/writing/android-emulator-speed/03.png' | relative_url }}"
+       alt="" width="503" height="695" loading="lazy" decoding="async">
+</figure>
+
+<p>That's all. Launch your AVD and feel the speed. :-)</p>
+
+<p>Note: Unfortunately, this may not work if your computer does not support hardware virtualization, or you are on AMD platform. Here is a list from Intel of the CPUs that support hardware virtualization (I hope your CPU is listed here).</p>
+
+<p>Feel free to comment for suggestions and corrections...</p>

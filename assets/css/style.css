@@ -3,6 +3,27 @@
    A single stylesheet. Design tokens live at the top; change those first.
    ========================================================================== */
 
+/* ------------------------------------------------------------ honorifics -- */
+/* ﷺ ﷻ ﷽ ﷲ and the waqf mark ۚ, drawn from a 4 KB Amiri subset.
+
+   Why this exists: Noto Nastaliq Urdu does contain ﷺ, but as a full
+   calligraphic medallion that rises far above the line and collides with the
+   line above it — which is what makes a couplet containing it look broken.
+   Google Fonts makes it worse by serving a subset that omits the glyph
+   entirely, so some visitors got a tofu box instead. Amiri draws the same
+   honorific compactly, on the line, at text size.
+
+   `unicode-range` limits this face to exactly those five codepoints, so the
+   rest of the Urdu text is untouched Nastaliq. Self-hosted rather than pulled
+   from Google, because the whole point is not to depend on which subset
+   someone else decides to ship. */
+@font-face {
+  font-family: "Honorifics";
+  src: url("../fonts/honorifics.woff2") format("woff2");
+  unicode-range: U+06DA, U+FDF2, U+FDFA, U+FDFB, U+FDFD;
+  font-display: swap;
+}
+
 /* --------------------------------------------------------------- tokens -- */
 :root {
   --font-display: "Newsreader", ui-serif, Georgia, "Times New Roman", serif;
@@ -10,7 +31,10 @@
     "Helvetica Neue", Arial, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
     "Liberation Mono", monospace;
-  --font-urdu: "Noto Nastaliq Urdu", "Jameel Noori Nastaleeq", serif;
+  /* "Honorifics" must come first: a unicode-range face only claims its own
+     five codepoints, so listing it ahead of Nastaliq is what makes it win
+     for those and nothing else. */
+  --font-urdu: "Honorifics", "Noto Nastaliq Urdu", "Jameel Noori Nastaleeq", serif;
 
   --step--1: clamp(0.82rem, 0.79rem + 0.14vw, 0.89rem);
   --step-0: clamp(1rem, 0.96rem + 0.18vw, 1.08rem);
@@ -780,22 +804,6 @@ details.course .course__body {
   font-size: 0.95rem;
   max-width: var(--prose);
 }
-details.course .course__materials-label {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  margin: 1rem 0 0;
-  color: var(--text);
-  font-size: 0.85rem;
-  font-weight: 600;
-}
-details.course .course__materials-label svg { width: 1rem; height: 1rem; }
-details.course .course__files {
-  margin: 0.4rem 0 0;
-  padding-left: 1.2rem;
-  font-size: 0.9rem;
-}
-details.course .course__files li + li { margin-top: 0.25rem; }
 
 /* ----------------------------------------------------------------- hero -- */
 /* Two columns on wide screens: text left, portrait right. The portrait comes
@@ -1101,7 +1109,12 @@ h1.urdu, h2.urdu, h3.urdu {
 .verse .stanza {
   margin: 0 0 2.6rem;
   font-size: 1.2em;
-  line-height: 1.95;
+  /* Nastaliq descends steeply and a misra can carry a superscript honorific,
+     so the misras of a couplet need more room between them than Latin verse
+     would. Still well under the 2.6rem that separates one couplet from the
+     next — the gap within a couplet must stay visibly the smaller of the
+     two, or the poem reads as a flat list of lines. */
+  line-height: 2.25;
   text-wrap: balance;
 }
 .verse .stanza:last-child { margin-bottom: 0; }
@@ -1214,7 +1227,7 @@ h1.urdu, h2.urdu, h3.urdu {
 .items .item__body.urdu { text-align: left; }
 
 @media (max-width: 560px) {
-  .verse .stanza { font-size: 1.08em; line-height: 1.85; margin-bottom: 2rem; }
+  .verse .stanza { font-size: 1.08em; line-height: 2.1; margin-bottom: 2rem; }
 }
 
 /* Latin text inside an RTL block (code, URLs, English words). */
@@ -1276,6 +1289,112 @@ h1.urdu, h2.urdu, h3.urdu {
   margin-top: 0.5rem;
 }
 .post-body table { display: block; overflow-x: auto; }
+
+/* A photograph from a travel piece. The originals are 640px wide, so the
+   figure is capped there rather than stretched — an upscaled photo looks
+   worse than a small sharp one. Caption sits under the frame, quiet. */
+.post-figure {
+  margin: 2.2rem auto;
+  max-width: min(100%, 640px);
+}
+.post-figure img {
+  width: 100%;
+  height: auto;
+  margin: 0;
+}
+.post-figure figcaption {
+  margin-top: 0.6rem;
+  line-height: 1.7;
+  text-align: center;
+}
+
+/* A lead image opening a post. It is the first thing on the page, so it runs
+   the full measure and sits tight under the title rather than floating in the
+   middle of the reading column. */
+.post-figure--lead {
+  max-width: 100%;
+  margin: 0 0 2.4rem;
+}
+/* An Urdu caption still reads right-to-left, but stays centred under its
+   photo rather than pushing to one edge. */
+.rtl .post-figure figcaption { text-align: center; }
+
+/* Two figures in a row on a wide screen would fight the reading column, so
+   they simply stack. On a narrow screen the cap is the column width. */
+@media (max-width: 560px) {
+  .post-figure { margin: 1.6rem auto; }
+}
+
+/* Lists inside imported prose. */
+.post-body ul, .post-body ol { margin: 1.2rem 0; padding-inline-start: 1.4rem; }
+.post-body li { margin-bottom: 0.5rem; }
+.rtl.post-body ul, .rtl.post-body ol { padding-inline-start: 1.4rem; }
+
+/* A quoted passage inside a post — an ayah, a hadith, a line from a book. */
+.post-body blockquote {
+  margin: 1.8rem 0;
+  padding-inline-start: 1.2rem;
+  border-inline-start: 3px solid var(--accent-soft);
+  color: var(--text-muted);
+}
+.post-body blockquote p:last-child { margin-bottom: 0; }
+/* The source of a quotation — a surah, a hadith collection, a book. */
+.post-body blockquote footer {
+  margin-top: 0.7rem;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  font-style: normal;
+}
+
+/* Console output, source listings and config files carried over from the old
+   blog. These are wide by nature, so the block scrolls inside itself rather
+   than pushing the page sideways. */
+.post-body pre {
+  max-width: 100%;
+  font-size: 0.8rem;
+  line-height: 1.55;
+  tab-size: 4;
+}
+.post-body pre code { white-space: pre; }
+
+/* Imported technical prose runs identifiers through ordinary sentences —
+   protocol="org.apache.coyote.http11.Http11NioProtocol" and the like. One of
+   those is wider than a phone column and, with nowhere legal to break, drags
+   the whole page sideways. Let the browser break inside a word, but only
+   when the word genuinely cannot fit. */
+.post-body p,
+.post-body li,
+.post-body h2,
+.post-body h3,
+.post-body figcaption { overflow-wrap: break-word; }
+
+/* A two-column comparison. The wrapper is what scrolls on a narrow screen —
+   a table that sets its own overflow cannot also size to its content. */
+.table-wrap { overflow-x: auto; margin: 1.8rem 0; }
+.compare { min-width: 34rem; margin: 0; }
+.compare th {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--text);
+  font-weight: 600;
+}
+.compare td { width: 50%; padding-right: 1.2rem; line-height: 1.6; }
+.compare tbody tr:last-child td { border-bottom: 0; }
+
+/* An English line dropped into an Urdu narrative — reported speech, a book
+   quotation. It reads left-to-right in the body font, not the mono font the
+   generic .ltr rule uses for code. */
+.rtl.post-body p.ltr {
+  direction: ltr;
+  text-align: left;
+  font-family: var(--font-body);
+  unicode-bidi: embed;
+}
 
 @media print {
   .site-header, .site-footer, .theme-toggle, .hero__actions { display: none !important; }

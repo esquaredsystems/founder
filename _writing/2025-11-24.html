@@ -1,0 +1,86 @@
+---
+title: "Languages don't fail. Developers do"
+date: 2025-11-24
+permalink: "/writing/2025/november/languages-dont-fail/"
+category: "technology"
+description: "A mutating list, the GIL, and 280MB of integers - none of which is the language's fault."
+---
+
+<figure class="post-figure post-figure--lead">
+  <img src="{{ '/assets/img/writing/languages-dont-fail/01.jpg' | relative_url }}"
+       alt="" width="1280" height="720" fetchpriority="high" decoding="async">
+</figure>
+
+<p>A few days ago, I stumbled upon a post which presented one of the design-level issues with Python. It goes like this:</p>
+
+<pre><code>fruits = ['Apple', 'Pineapple', 'Papaya', 'Cherry', 'Fig', 'Pomegranate', 'Mango']
+for fruit in fruits:
+    if (fruit.startswith('P')):
+        fruits.remove(fruit)
+print (fruits)
+Output: ['Apple', 'Papaya', 'Cherry', 'Fig', 'Mango']</code></pre>
+
+<p>Of course, this was hilarious. You’d expect the strings starting with ‘P’ to be eliminated, but the way Python’s foreach loop works is that the index marches forward blindly, while the array itself is being mutated.</p>
+
+<p>Do the same in Java:</p>
+
+<pre><code>ArrayList&lt;String&gt; fruits = new ArrayList&lt;&gt;(Arrays.asList("Apple", "Pineapple", "Papaya", "Cherry", "Fig", "Pomgranate", "Mango"));
+for (String fruit : fruits)
+    if (fruit.startsWith("P"))
+        fruits.remove(fruit);
+System.out.println(Arrays.toString(fruits.toArray()));</code></pre>
+
+<p>And it will throw ConcurrentModificationException. It doesn’t like the idea of modifying the playlist in the middle of concert.</p>
+
+<p>Now, to be clear, I’m not here to rant. I’m at a stage where I no longer consider myself a good programmer, as I’ve forgotten more languages than I currently know. What compelled me to write this post is the sheer number of people who were in shock. As if it were a secluded anomaly that was never meant to happen. Let me present a few more cases. I’ll take Java for reference.</p>
+
+<p>Here’s Python with its GIL issues:</p>
+
+<pre><code>def task():
+    x = 0
+    for i in range(50_000_000):
+        x += i
+t1 = threading.Thread(target=task)
+t2 = threading.Thread(target=task)
+start = time.time()
+t1.start(); t2.start()
+t1.join(); t2.join()
+print("Time:", time.time() - start)
+Output: Time: 2.686</code></pre>
+
+<p>Meanwhile Java with true parallelization:</p>
+
+<pre><code>Runnable task = () -&gt; {
+    long x = 0;
+    for (long i = 0; i &lt; 5_000_000_000L; i++)
+        x += i;
+};
+Thread t1 = new Thread(task);
+Thread t2 = new Thread(task);
+long start = System.currentTimeMillis();
+t1.start(); t2.start();
+t1.join(); t2.join();
+System.out.println("Time: " + (System.currentTimeMillis() - start) / 1000 + "s");
+Output: Time: 1.267s</code></pre>
+
+<p>And I bet you didn’t even notice that in Java, the loop is running 5 billion times, while in Python it was 50 million.</p>
+
+<p>Now, how about memory consumption!</p>
+
+<pre><code>int[] arr = new int[10000000];</code></pre>
+
+<p>This declaration in Java consumes ~40MB</p>
+
+<p>In Python:</p>
+
+<pre><code>arr = [i for i in range(10_000_000)]</code></pre>
+
+<p>The memory consumption is ~280MB, as each integer is treated as an object.</p>
+
+<p>And I’ve barely scratched the surface here. But as I said, this isn’t a rant. Java isn’t my #1 language, that would be C. Python isn’t my least favourite, that title belongs to PHP. Yet, I almost never program on C, and complimentarily not vowed against using PHP either.</p>
+
+<p>The point I want to share is that Java is beautiful when it comes to OOP, efficiency and reliability. Python is also beautiful when it comes to learning programming for a hobby or to solve an immediate problem.</p>
+
+<p>It all comes down to the one sitting between keyboard and chair. If you are disciplined, thorough, problem-focused, you’ll do wonders on Python. If you are clumsy, shallow, tech-focused, you’ll produce garbage on Java.</p>
+
+<p>It’s not the language. It’s the understanding.</p>

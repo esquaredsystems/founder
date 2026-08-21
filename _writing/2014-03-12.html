@@ -1,0 +1,157 @@
+---
+title: "Executing MapReduce Applications on Hadoop (Single-node Cluster) - Part 3"
+date: 2014-03-12
+permalink: "/writing/2014/march/mapreduce-part-3/"
+category: "technology"
+description: "Part 3: writing a MapReduce application of your own."
+---
+
+<p>In our previous experiment, we ran source code of Word count MapReduce application eclipse. This time, we are going to write our own piece of code.</p>
+
+<p>Remember Permutations and Combinations you studied in College? We will write a fresh approach to compute combinations of all strings in a file. You'll have to make a very few changes to the existing code.</p>
+
+<p>First, you need to create a text file with some words separated by spaces:</p>
+
+<ul>
+  <li>Create a new text file named words.txt in /home/hadoop/Documents/combinations/</li>
+  <li>Enter some text like:</li>
+</ul>
+
+<p>Astronomystar sun earth moon milkyway asteroid pulsar nebula mars venus jupiter neptune saturn blackhole galaxy cygnus cosmic comet solar eclipse globular panorama apollo discovery seti aurora dwarf halebopp plasmasphere supernova cluster europa juno keplar helios indego genamede neutrinos callisto messier nashville sagittarius corona circinus hydra whirlpool rosette tucanaeAndroidcupcake donut eclair froyo gingerbread honeycomb icecreamsandwich jellybean kitkat lemonadeUbuntuwarty warthog haory hedgehog breezy badger dapper drake edgy eft feisty fawn gutsy gibbon herdy heron intrepid ibex jaunty jackalope karmic koala lucid lynx meverick meerkat natty narwhal oneiric ocelot raring ringtail</p>
+
+<p>- Save and exit</p>
+
+<p>Now open your Eclipse. In your existing Combinatorics Project, add a new Class:</p>
+
+<ul>
+  <li>Right click on src &gt; New &gt; Class</li>
+  <li>Name it Combinations</li>
+  <li>Replace the code with the following:</li>
+</ul>
+
+<pre><code>import java.io.IOException;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.SortedSet;
+import java.util.StringTokenizer;
+import java.util.TreeSet;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;</code></pre>
+
+<p>/**</p>
+
+<p>* MapReduce Application to discover combinations of all words in a text file</p>
+
+<p>*</p>
+
+<p>* @author hadoop</p>
+
+<p>*</p>
+
+<p>*/</p>
+
+<pre><code>public class Combinations {</code></pre>
+
+<pre><code>// Inherit Mapper class, our input and output will be all text
+public static class MyMap extends Mapper&lt;LongWritable, Text, Text, Text&gt; {
+// Empty string to write as values against keys by default
+private Text term = new Text();</code></pre>
+
+<pre><code>// Mapping function to map all words to key-value pairs
+protected void map(LongWritable key, Text value, Context context)
+throws IOException, InterruptedException {
+// Convert all text to a string
+String str = value.toString();
+// Tokenizer to break text into words, separated by space
+StringTokenizer tokenizer = new StringTokenizer(str, " ");
+// Write a key-value pair against each term to context (job)
+while (tokenizer.hasMoreTokens()) {
+term.set(tokenizer.nextToken());
+// If length of the term exceeds 20 characters, skip it, because
+// processing strings of greater lengths may not be possible
+if (term.getLength() &gt; 20)
+continue;
+// Initially, pass term as both key and value
+context.write(term, term);
+}
+};
+}</code></pre>
+
+<pre><code>// Inherit Reducer class, this will be executed on multiple nodes and write
+// output to text file
+public static class MyReduce extends Reducer&lt;Text, Text, Text, Text&gt; {
+protected void reduce(Text key, Iterable&lt;Text&gt; values, Context context)
+throws IOException, InterruptedException {
+// Sorted collection to store set of combinations
+SortedSet&lt;String&gt; list = new TreeSet&lt;String&gt;();
+// Iterate for each key
+for (Text text : values) {
+// Find out all combinations of a string
+String str = text.toString();
+int length = str.length();
+// The number of combinations is 2^(n-1)
+int total = ((Double) Math.pow(2, length)).intValue() - 1;
+for (int i = 0; i &lt; total; i++) {
+String tmp = "";
+char[] charArray = new StringBuilder(
+Integer.toBinaryString(i)).reverse().toString()
+.toCharArray();
+for (int j = 0; j &lt; charArray.length; j++) {
+if (charArray[j] == '1') {
+tmp += str.charAt(j);
+}
+}
+list.add(tmp);
+}
+list.add(str);
+}
+// Write term as key and its combinations to output
+context.write(key, new Text(Arrays.toString(list.toArray())));
+};
+}</code></pre>
+
+<pre><code>public static void main(String[] args) throws Exception {
+Configuration conf = new Configuration();
+// Initiate MapReduce job, named combinations
+Job job = new Job(conf, "combinations");
+// Our keys in output will be text
+job.setOutputKeyClass(Text.class);
+// Our values in output will be text
+job.setOutputValueClass(Text.class);
+job.setMapperClass(MyMap.class);
+job.setReducerClass(MyReduce.class);
+job.setInputFormatClass(TextInputFormat.class);
+job.setOutputFormatClass(TextOutputFormat.class);
+// Fetch input/output paths from arguments
+FileInputFormat.addInputPath(job, new Path(args[0]));
+// Create a time stamped directory inside input directory for output
+FileOutputFormat.setOutputPath(job,
+new Path(args[0] + String.valueOf(new Date().getTime())));
+job.waitForCompletion(true);
+}
+}</code></pre>
+
+<p>Execute the code:</p>
+
+<ul>
+  <li>Right click &gt; Run As &gt; Run Configurations</li>
+  <li>Right click on Java Application (from left pane) &gt; New</li>
+  <li>On top, name it Combinations</li>
+  <li>In Arguments tab, write /home/hadoop/Documents/combinations/</li>
+  <li>Apply and Run</li>
+</ul>
+
+<p>The MapReduce application should run and you should be able to collect the output in a time stamped folder in /home/hadoop/Documents/combinations/ directory</p>
+
+<p>This algorithm is explained in detail here. You should also read the comments, the rest of the code is self-explanatory.</p>
+
+<p>With this experiment, we'll wrap up our experiments on Single-node Hadoop clusters. I will encourage you to do some more experiments and make yourself comfortable before you try out something Big.</p>

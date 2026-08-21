@@ -1,0 +1,77 @@
+---
+title: "5 things to do when you cannot trace a bug"
+date: 2013-09-13
+permalink: "/writing/2013/september/five-things-bug-tracing/"
+category: "technology"
+description: "When the bug will not show itself: five things that actually help."
+---
+
+<p>Programming today, is more about fixing existing code than writing new. In most of the cases, bugs are easy to trace, especially when you are using a modern IDEs like Eclipse or Visual Studio. However, it is very likely that you get trapped in situations like a specific button not doing anything, application crashing randomly, or a record not updating for a specific ID. Here are some tips you may find lifesavers if you get jammed too often when debugging your code:</p>
+
+<h2>Catching random errors</h2>
+
+<p>Remember, there are no random errors unless you are calling a random function. The code is always consistent, if a function calculates compound interest of an amount over a certain period of time -- within an allowed range -- correctly, it will never do it wrong as long as the parameter values are in range. So, the code is consistent. Data, however, may not be. Here is an example:</p>
+
+<pre><code>public boolean saveRecordInDB (int id, String name, float height, float weight) {
+// Do something
+}</code></pre>
+
+<p>Test:</p>
+
+<pre><code>saveRecordInDB (1, "Owais", 5.6, 52);
+saveRecordInDB (1, "Ahmed", 6.2, 78);</code></pre>
+
+<p>If the first method worked fine and the other didn't, it is very clear that this is something to do with the data in arguments. When you'll dig in deep, you might find that the id that goes into database is Primary key-indexed and is therefore throwing back duplication error. Same is true with NULL, values out of range, etc.</p>
+
+<h2>Reading stack trace</h2>
+
+<p>Stack trace that -- lines and lines of activities that the runtime environment (JRE, CLR, etc.) is generating -- mainly comprises of methods being called from your code and the libraries you're using, writes all activities on console. Whenever there is an uncaught exception, the whole trace is displayed and programmers are often reluctant to read it. However, stack traces -- scary as they look -- are only to help identify the main source of problem. Always start looking from bottom, your eyes should be scanning the words like "Exception", "Error", "Failed". Once you spot an Exception, now you'll read from top to bottom, look for the classes and methods "you" have written, not for the libraries and APIs you're using.</p>
+
+<p>The better your exception handling in your code, the easier the stack traces are to read. Target NullPointerException, IndexOutOfBoundException, IllegalArgumentException and ClassCastException - the most frequently thrown exceptions, and often uncaught.</p>
+
+<p>There are smart ways to avoid these exceptions without the trouble of writing try/catch block (Java):</p>
+
+<p>- To handle NullPointerException</p>
+
+<pre><code>public int getInteger(Object obj) {
+if (obj == null)
+return;
+Integer i = Integer.parseInt (obj);
+return i.intValue ();
+}</code></pre>
+
+<pre><code>public boolean isStringEmpty(String str) {
+return ("".equals(str)); // Avoid writing str.equals("")
+}</code></pre>
+
+<p>- To handle ClassCastException</p>
+
+<pre><code>public MyClass objToMyClass (Object obj) {
+if (obj instanceof MyClass)
+return (MyClass) obj;
+return null;
+}</code></pre>
+
+<p>In cases when you find yourself completely out of luck, search the web for the exception you doubt, is causing the issues. But copy-paste the exception is not always a good idea; if you see an exception like:</p>
+
+<pre><code>Exception in thread "main" java.lang.ClassCastException: java.lang.Integer cannot be cast to java.util.ArrayList at MyClass.main(MyClass.java:34)</code></pre>
+
+<p>Remove "MyClass" part from the search query. Search only for Exception in thread "main" java.lang.ClassCastException: java.lang.Integer cannot be cast to java.util.ArrayList at. Because there are strong chances that someone has already encountered similar problem and posted on some developers' forum, but their class and method names will be different. Thus, the search engine may not return any results.</p>
+
+<h2>Pinpoint the location</h2>
+
+<p>Identify the origination of the bug. Start with which tier it occurs in, the Client (Java/VB script, applet), Presentation (Servlet, JSP, ASP, JavaBean), Controller (Server, Implementation classes, Factories), Data (SQL Engine, Cloud, No-SQL Database). Next is the module or package, is the error generating from client code, a utility, server-side implementation classes, or another libarary? Once you figure this out, then looking for the specific method and line is just a matter of time.</p>
+
+<h2>Explain the code to someone else</h2>
+
+<p>This is very handy. Explaining your code to some other programmer requires you to go into details and specific, which you probably would've skipped assuming "Oh! That works, I know. Let's move forward". It is then when you find that the bug was actually in the part you overlooked. This has worked for me countless times.</p>
+
+<h2>Take a break</h2>
+
+<p>Here, you're going to play with your brain's short-term memory. Think of it as cache that gets cleared whenever not in use for long time. When you are writing code, you have a lot in your short-term memory, which tells you "Hey! This part's okay", "Oh! That line's fine. I remember". You cannot debug with so many assumptions about your code's correctness. So in order to clear your short-term memory. Take a break. Read an article in your to-read list. Check your emails, play a game. Don't even throw a glance at your code unless you forget completely about what you were debugging, how is the method call hierarchy, etc.</p>
+
+<p>In the end, bug tracing and fixing is a skill that furnishes with experience and there are no rules of thumb for dealing with bugs. Whenever you feel hopeless, ask for help, there are thousands of professionals on on line forums like StackOverFlow and XDA-Developers.</p>
+
+<p>Please feel free to leave your comments, pointing mistakes and enhancements.</p>
+
+<p>Happy fixing.</p>

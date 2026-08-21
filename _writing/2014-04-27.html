@@ -1,0 +1,202 @@
+---
+title: "Hadoop Bullet: a simple script to deploy Hadoop on fresh machine in automated fashion"
+date: 2014-04-27
+permalink: "/writing/2014/april/hadoop-bullet/"
+category: "technology"
+description: "One shell script that installs Hadoop on a fresh machine."
+---
+
+<p>Installing Hadoop is a hassle; it involves a variety of steps, some proficiency on Linux commands and writing to various files. If you have tried manual installation, you know what I'm talking about.</p>
+
+<p>So, here is a simple Linux shell script. Save the following script as bulletinstall.sh and on your Ubuntu-ready machine, run it using:</p>
+
+<pre><code>$ sudo sh bulletinstall.sh</code></pre>
+
+<p>This script has been tested on Ubuntu 14.04 LTS; if you experience any issues, feel free to drop a comment. Here is the script:</p>
+
+<p>#!/bin/bash</p>
+
+<pre><code># This document is free to share and/or modify, and comes with ABSOLUTELY NO WARRANTIES. I will not be responsible for any damage or corruption caused to your Computer. Do know your stuff before you run this and backup your important files before trying out.</code></pre>
+
+<pre><code># Author: owaishussain@outlook.com</code></pre>
+
+<pre><code># LINUX SCRIPT TO INSTALL HADOOP 1.2.1 ON A MACHINE</code></pre>
+
+<pre><code># If you already have this file, then put it in /tmp directory and comment out "wget"
+HADOOP_URL=http://www.us.apache.org/dist/hadoop/common/hadoop-1.2.1/hadoop-1.2.1.tar.gz</code></pre>
+
+<p>echo "************************************************************"</p>
+
+<pre><code>cd /tmp</code></pre>
+
+<p>echo "Downloading Apache Hadoop from $HADOOP_URL (you may change the version to any other, but this one has been tested)"</p>
+
+<pre><code>wget "$HADOOP_URL"</code></pre>
+
+<p>echo "STEP 1/10 COMPLETE..."</p>
+
+<p>echo "************************************************************"</p>
+
+<pre><code># Hadoop will be deployed on "/usr/local" directory, if you want to change it, then modify the path under this section
+echo "************************************************************"
+echo "Extracting files..."
+tar -xzf hadoop-1.2.1.tar.gz</code></pre>
+
+<p>echo "Copying to \"/usr/local/\""</p>
+
+<p>cp -R hadoop-1.2.1 /usr/local/</p>
+
+<p>echo "STEP 2/10 COMPLETE..."</p>
+
+<p>echo "************************************************************"</p>
+
+<pre><code># Oracle JDK7 will be downloaded from a 3rd party repository (ppa:webupd8team/java. Credit to them). In case, it is unavailable, you may use an alternative in the first command under this section</code></pre>
+
+<p>echo "************************************************************"</p>
+
+<p>echo "Installing Oracle JDK7. Please accept the Oracle license when asked"</p>
+
+<p>add-apt-repository ppa:webupd8team/java</p>
+
+<p>apt-get update</p>
+
+<pre><code># If you are skeptik about JDK7 (and I won't blame you for that), you may switch comments respectively, in the two lines below to install JDK6</code></pre>
+
+<p>apt-get install oracle-java7-installer</p>
+
+<p>#apt-get install sun-java6-jdk</p>
+
+<p>echo "STEP 3/10 COMPLETE..."</p>
+
+<p>echo "************************************************************"</p>
+
+<pre><code># This script assumes that you will run Hadoop on new user \"hadoop\". If you wish to choose different user, you're most welcome to; just comment whole section below, but be sure to replace the username everywhere in the script with what you want
+echo "************************************************************"
+echo "Creating user and group named\" hadoop\""
+adduser hadoop
+adduser hadoop sudo
+echo "Creating home directory for user"
+mkdir -p /home/hadoop/tmp
+echo "Assigning rights on home directory"
+chown -R hadoop:hadoop /home/hadoop/tmp
+chmod 755 /home/hadoop/tmp
+echo "Changing ownership of Hadoop's installation directory"
+chown -R hadoop:hadoop /usr/local/hadoop-1.2.1</code></pre>
+
+<p>echo "STEP 4/10 COMPLETE..."</p>
+
+<p>echo "************************************************************"</p>
+
+<pre><code># This is to test and initialize the newly created user</code></pre>
+
+<p>echo "************************************************************"</p>
+
+<p>echo "Logging in. ***** PLEASE PROVIDE PASSWORD AND RUN 'exit' (without quotes) TO LOG OUT *****"</p>
+
+<p>su - hadoop</p>
+
+<p>echo "STEP 5/10 COMPLETE..."</p>
+
+<p>echo "************************************************************"</p>
+
+<p>echo "************************************************************"</p>
+
+<p>echo "Setting environment variables"</p>
+
+<pre><code>cd /usr/local/hadoop-1.2.1/conf</code></pre>
+
+<p>echo "export JAVA_HOME=/usr/lib/jvm/java-7-oracle" &gt;&gt; hadoop-env.sh</p>
+
+<p>echo "STEP 6/10 COMPLETE..."</p>
+
+<p>echo "************************************************************"</p>
+
+<p>echo "************************************************************"</p>
+
+<p>echo "Configuring Hadoop properties in *site.xml"</p>
+
+<p>mv core-site.xml core-site.xml.bck</p>
+
+<p>touch core-site.xml</p>
+
+<p>echo "&lt;?xml version=\"1.0\"?&gt;</p>
+
+<pre><code>&lt;?xml-stylesheet type=\"text/xsl\" href=\"configuration.xsl\"?&gt;
+&lt;configuration&gt;
+&lt;property&gt;
+&lt;name&gt;hadoop.tmp.dir&lt;/name&gt;
+&lt;value&gt;/home/hadoop/tmp&lt;/value&gt;
+&lt;/property&gt;
+&lt;property&gt;
+&lt;name&gt;fs.default.name&lt;/name&gt;
+&lt;value&gt;hdfs://localhost:54310&lt;/value&gt;
+&lt;/property&gt;
+&lt;/configuration&gt;" &gt; core-site.xml
+mv mapred-site.xml mapred-site.xml.bck
+touch mapred-site.xml
+echo "&lt;?xml version=\"1.0\"?&gt;
+&lt;?xml-stylesheet type=\"text/xsl\" href=\"configuration.xsl\"?&gt;
+&lt;configuration&gt;
+&lt;property&gt;
+&lt;name&gt;mapred.job.tracker&lt;/name&gt;
+&lt;value&gt;localhost:54311&lt;/value&gt;
+&lt;/property&gt;
+&lt;/configuration&gt;" &gt; mapred-site.xml
+mv hdfs-site.xml hdfs-site.xml.bck
+touch hdfs-site.xml
+echo "&lt;?xml version=\"1.0\"?&gt;
+&lt;?xml-stylesheet type=\"text/xsl\" href=\"configuration.xsl\"?&gt;
+&lt;configuration&gt;
+&lt;property&gt;
+&lt;name&gt;dfs.replication&lt;/name&gt;
+&lt;value&gt;1&lt;/value&gt;
+&lt;/property&gt;
+&lt;/configuration&gt;" &gt; hdfs-site.xml
+chown hadoop:hadoop /usr/local/hadoop-1.2.1/conf/*-site.xml</code></pre>
+
+<p>echo "STEP 7/10 COMPLETE..."</p>
+
+<p>echo "************************************************************"</p>
+
+<p>echo "************************************************************"</p>
+
+<p>echo "export JAVA_HOME=/usr/lib/jvm/java-7-oracle" &gt;&gt; /home/hadoop/.bashrc</p>
+
+<p>echo "export HADOOP_HOME=/usr/local/hadoop-1.2.1" &gt;&gt; /home/hadoop/.bashrc</p>
+
+<p>echo "export PATH=$PATH:/usr/local/hadoop-1.2.1/bin" &gt;&gt; /home/hadoop/.bashrc</p>
+
+<p>echo "STEP 8/10 COMPLETE..."</p>
+
+<p>echo "************************************************************"</p>
+
+<p>echo "************************************************************"</p>
+
+<p>echo "Installing OpenSSH Server"</p>
+
+<p>apt-get install openssh-server</p>
+
+<pre><code>ssh-keygen -t rsa -P ""
+cat /home/hadoop/.ssh/id_rsa.pub &gt;&gt; /home/hadoop/.ssh/authorized_keys</code></pre>
+
+<p>echo "STEP 9/10 COMPLETE..."</p>
+
+<p>echo "************************************************************"</p>
+
+<p>echo "************************************************************"</p>
+
+<p>echo "Removing temporary files"</p>
+
+<pre><code># If you want to preserve the downloaded Hadoop application, you may comment out the first command under this section</code></pre>
+
+<p>rm hadoop-1.2.1.tar.gz</p>
+
+<p>rm -R hadoop-1.2.1</p>
+
+<p>echo "STEP 10/10 COMPLETE..."</p>
+
+<p>echo "************************************************************"</p>
+
+<p>echo "Congratulations! Your Hadoop setup is complete. Please log into hadoop user and start hadoop services."</p>
+
+<p>echo "************************************************************"</p>

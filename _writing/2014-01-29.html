@@ -1,33 +1,204 @@
 ---
-title: "قصیدہ والضّحیٰ"
-subtitle: "از شانِ پاکِ سید لولاک صلی اللہ علیہ وسلم"
+title: "7-step guide to set up Hadoop (single-node Cluster) on Ubuntu Virtual Machine"
 date: 2014-01-29
-permalink: "/writing/2014/january/qaseeda-waz-zuha/"
-category: "poetry"
-lang: "ur"
-dir: "rtl"
-description: "ہے کلام اللہ میں یہ ماہ پارہ والضُّحیٰ"
+permalink: "/writing/2014/january/hadoop-single-node/"
+category: "technology"
+description: "Seven steps from a bare Ubuntu VM to a running single-node Hadoop cluster."
 ---
 
-<div class="verse">
-  <p class="stanza">ہے کلام اللہ میں یہ ماہ پارہ &quot;والضُّحیٰ&quot;۔<br>
-  خالقِ اکبر نے یہ رقعہ اُتارا &quot;والضُّحیٰ&quot;۔</p>
+<p>Apache Hadoop is a framework for distributed computing, based on Hadoop Distributed File System (HDFS); it offers a solution for large-scale data containment and processing by incorporating a system to distribute the data keeping, its retrieval and processing to inexpensive hardware.</p>
 
-  <p class="stanza">جب حرا سے باہر آئے گھپ اندھیرا چیرتے۔<br>
-  دیکھ کر مالک نے تشبیہاً پکارا &quot;والضُّحیٰ&quot;۔</p>
+<p>Fancy as it seems, deploying and configuring Hadoop, unfortunately isn't a trivial process. It requires big effort, time and expertise.</p>
 
-  <p class="stanza">واں کلیم اللہ نے پایا یدِ بیضا نشان۔<br>
-  یاں حبیب اللہﷺ ہیں جملہ سراپا۔۔ &quot;والضُّحیٰ&quot;۔</p>
+<p>In this post, we will try to demonstrate how to setup a single-node cluster of Hadoop on a Ubuntu Linux virtual machine, purely for experimental purposes. If done correctly, this might be helpful for large-scale deployments. Let's get started.</p>
 
-  <p class="stanza">اللہ! اللہ! عائشہؓ نے سوئی کھو کر کر لیا۔<br>
-  جھلملاتی کہکشاؤں کا نظارا۔ &quot;والضُّحیٰ&quot;۔</p>
+<h2>Step 1: Getting Ubuntu VM ready</h2>
 
-  <p class="stanza">&quot;قَابَ قَوۡسَيۡن&quot; ابرو، پلکیں۔ چشم &quot;مَا زَاغَ الۡبَصَر&quot;۔<br>
-  گیسوئے &quot;والَّیۡل&quot; اُن کے۔ نور چہرہ &quot;والضُّحیٰ&quot;۔</p>
+<p>First step is to install Oracle VirtualBox on your machine and create an Ubuntu (13.04) Virtual machine.</p>
 
-  <p class="stanza">آپ کی نورانیتِ میں شک ذرا ہوتا اگر۔<br>
-  خالقِ لاریب کیوں قسمیں اُٹھاتا &quot;والضُّحیٰ&quot;؟</p>
+<p>After successful creation of Virtual Machine (VM), launch and update your OS on VM using the following combination of commands on Terminal (Ctrl+T):</p>
 
-  <p class="stanza">عاجزِؔ احقر کی کیا ہمّت کہے اُن پر کلام۔<br>
-  حق تعالیٰ خود کہے جن پر قصیدہ &quot;والضُّحیٰ&quot;۔</p>
-</div>
+<pre><code># Update your OS using aptitude commands
+$ sudo apt-get update
+$ sudo apt-get upgrade</code></pre>
+
+<figure class="post-figure">
+  <img src="{{ '/assets/img/writing/hadoop-single-node/01.png' | relative_url }}"
+       alt="" width="600" height="108" loading="lazy" decoding="async">
+</figure>
+
+<h2>Step 2: Installing JDK</h2>
+
+<p>Hadoop is designed on Java and hence requires Java Development Kit (JDK) to run. Although Ubuntu comes with built-in Open JDK, but it is recommended that you use Oracle’s JDK. Here is a bunch of commands, which will do that:</p>
+
+<pre><code>$ sudo add-apt-repository ppa:webupd8team/java
+$ sudo apt-get update
+$ sudo apt-get install oracle-java7-installer
+OR (if the above doesn’t work)
+$ sudo update-java-alternatives -s java-7-oracle
+$ sudo apt-get install oracle-java7-set-default
+$ java –version</code></pre>
+
+<figure class="post-figure">
+  <img src="{{ '/assets/img/writing/hadoop-single-node/02.png' | relative_url }}"
+       alt="" width="602" height="313" loading="lazy" decoding="async">
+</figure>
+
+<p>If the installation was successful, the last command should print the version of JDK you have installed.</p>
+
+<h2>Step 3: Setting up SSH</h2>
+
+<p>We need to configure Secure Shell (SSH), which is required by Hadoop Cluster to manage its nodes. In order to do so, install Open SSH Server first:</p>
+
+<pre><code>$ sudo apt-get install openssh-server</code></pre>
+
+<figure class="post-figure">
+  <img src="{{ '/assets/img/writing/hadoop-single-node/03.png' | relative_url }}"
+       alt="" width="602" height="451" loading="lazy" decoding="async">
+</figure>
+
+<p>Now you need to create a public key for SSH; execute the following command:</p>
+
+<pre><code># Generate key using RSA algorithm and empty password
+$ ssh-keygen -t rsa -P ""</code></pre>
+
+<figure class="post-figure">
+  <img src="{{ '/assets/img/writing/hadoop-single-node/04.png' | relative_url }}"
+       alt="" width="602" height="385" loading="lazy" decoding="async">
+</figure>
+
+<p>The encryption algorithm used here is RSA and the empty space after –P switch indicates that we are creating a password less public key (learn more here), since this setup is for experimental purpose. On production environment, you should always enter a password. Next, enable SSH access to your local machine with the following command:</p>
+
+<pre><code>$ cat /home/hadoop/.ssh/id_rsa.pub &gt;&gt; /home/hadoop/.ssh/authorized_keys</code></pre>
+
+<p>Test the ssh service by ssh’ing localhost (your own VM):</p>
+
+<pre><code>$ ssh localhost</code></pre>
+
+<figure class="post-figure">
+  <img src="{{ '/assets/img/writing/hadoop-single-node/05.png' | relative_url }}"
+       alt="" width="602" height="385" loading="lazy" decoding="async">
+</figure>
+
+<p>Your Ubuntu Linux is now configured and ready for Hadoop installation.</p>
+
+<h2>Step 4: Installing Hadoop</h2>
+
+<p>Download Hadoop from recommended mirror. You can either download/extract a zipped file (usually a tar file) to any directory you wish to install in (for example /usr/local/hadoop), or download a debian installer for Ubuntu and skip some configuration steps. Here we will use zipped file, version 1.2.1-1.</p>
+
+<p>When the file is downloaded, extract it to a folder in home directory, like Documents. Now open terminal (Ctrl+Alt+T) and copy the extracted files to /usr/local/ directory:</p>
+
+<pre><code>$ cd Documents/
+# Copy Hadoop to destination directory
+$ sudo cp –R hadoop_1.2.1/ /usr/local/
+$ cd /usr/local/
+$ ls
+# Rename the directory for ease
+$ sudo mv hadoop_1.2.1 hadoop</code></pre>
+
+<figure class="post-figure">
+  <img src="{{ '/assets/img/writing/hadoop-single-node/06.png' | relative_url }}"
+       alt="" width="602" height="159" loading="lazy" decoding="async">
+</figure>
+
+<p>You also need to change the ownership of Hadoop’s directory to the user “hadoop” recursively. Do so by executing:</p>
+
+<pre><code>$ cd /usr/local/
+# Recursively assign ownership to [user]:[group]
+$ sudo chown –R hadoop:hadoop hadoop</code></pre>
+
+<figure class="post-figure">
+  <img src="{{ '/assets/img/writing/hadoop-single-node/07.png' | relative_url }}"
+       alt="" width="602" height="108" loading="lazy" decoding="async">
+</figure>
+
+<h2>Step 5: Setting up Environment Variables</h2>
+
+<p>Next, we need to set up environment variables. On Ubuntu command (Alt+F2) type “gksu nautilus” to launch file manager with root privileges.</p>
+
+<p>Locate .bashrc file in /home/hadoop/ (or whatever the username is). Open this file and add the following lines at the end:</p>
+
+<pre><code># Set Environment variables
+export JAVA_HOME=/usr/lib/jvm/java-7-oracle
+export HADOOP_HOME=/usr/local/hadoop
+export PATH=$PATH:$HADOOP_HOME/bin</code></pre>
+
+<p>Save and exit the file.</p>
+
+<figure class="post-figure">
+  <img src="{{ '/assets/img/writing/hadoop-single-node/08.png' | relative_url }}"
+       alt="" width="602" height="409" loading="lazy" decoding="async">
+</figure>
+
+<p>Don’t just close the Explorer Window; you need to change JAVA_HOME to “/usr/lib/jvm/java-7-oracle” in another file – /usr/local/hadoop/conf/hadoop-env.sh. In this file, you can define some parameters to Hadoop’s daemon process, like heap size, or storing log files, etc.</p>
+
+<figure class="post-figure">
+  <img src="{{ '/assets/img/writing/hadoop-single-node/09.png' | relative_url }}"
+       alt="" width="602" height="409" loading="lazy" decoding="async">
+</figure>
+
+<p>We will now configure Hadoop file system (HDFS), where Hadoop will store data. First, create a directory for temporary files and point Hadoop towards it in its configuration to store temporary files. Go on and create a directory in /home/hadoop/hadoop/tmp using mkdir command in terminal (do not use sudo, or you’ll have to explicitly define permissions)</p>
+
+<h2>Step 6: Adding Properties</h2>
+
+<p>We need to define some essential properties in difference configuration files. First, we edit the /usr/local/hadoop/conf/core-site.xml file (if you are using terminal, you can edit using $ sudo nano /usr/local/hadoop/conf/core-site.xml). We need to add two properties, one to define the directory where HDFS will create its temporary files and the other to define its address and port, the file system will map to. Add the following properties at the end of this xml file just before the closing tag &lt;/configuration&gt;:</p>
+
+<pre><code>&lt;property&gt;
+&lt;name&gt;hadoop.tmp.dir&lt;/name&gt;
+&lt;value&gt;/home/hadoop/hadoop/tmp&lt;/value&gt;
+&lt;/property&gt;
+&lt;property&gt;
+&lt;name&gt;fs.default.name&lt;/name&gt;
+&lt;value&gt;hdfs://localhost:54310&lt;/value&gt;
+&lt;/property&gt;</code></pre>
+
+<figure class="post-figure">
+  <img src="{{ '/assets/img/writing/hadoop-single-node/10.png' | relative_url }}"
+       alt="" width="602" height="381" loading="lazy" decoding="async">
+</figure>
+
+<p>In the same directory, edit mapred-site.xml. Add property “mapred.job.tracker”:</p>
+
+<pre><code>&lt;property&gt;
+&lt;name&gt;mapred.job.tracker&lt;/name&gt;
+&lt;value&gt;localhost:54311&lt;/value&gt;
+&lt;/property&gt;</code></pre>
+
+<figure class="post-figure">
+  <img src="{{ '/assets/img/writing/hadoop-single-node/11.png' | relative_url }}"
+       alt="" width="602" height="381" loading="lazy" decoding="async">
+</figure>
+
+<p>Similarly, we will edit hdfs-site.xml file and set the file replication, i.e. the number of copies of a file that the file system will store. We only need single copy for now, but creating replicas is strongly recommended for production systems:</p>
+
+<pre><code>&lt;property&gt;
+&lt;name&gt;dfs.replication&lt;/name&gt;
+&lt;value&gt;1&lt;/value&gt;
+&lt;/property&gt;</code></pre>
+
+<figure class="post-figure">
+  <img src="{{ '/assets/img/writing/hadoop-single-node/12.png' | relative_url }}"
+       alt="" width="602" height="381" loading="lazy" decoding="async">
+</figure>
+
+<h2>Step 7: Starting Hadoop Services</h2>
+
+<p>We will now format the HDFS file system. This is required in order to remove all data in the cluster for initial installation:</p>
+
+<pre><code>$ hadoop namenode –format</code></pre>
+
+<figure class="post-figure">
+  <img src="{{ '/assets/img/writing/hadoop-single-node/13.png' | relative_url }}"
+       alt="" width="602" height="472" loading="lazy" decoding="async">
+</figure>
+
+<p>Finally, start the Hadoop cluster on a single node. This will start some services (Namenode, Datanode, Jobtracker and Tasktracker):</p>
+
+<pre><code>$ start-all.sh</code></pre>
+
+<figure class="post-figure">
+  <img src="{{ '/assets/img/writing/hadoop-single-node/14.png' | relative_url }}"
+       alt="" width="602" height="242" loading="lazy" decoding="async">
+</figure>
+
+<p>That’s it. You have configured Hadoop on a single-node cluster. The real thing is what you do with it – soon to come.</p>

@@ -1,0 +1,367 @@
+---
+title: "Step-by-step guide to set up Multi-node Hadoop Cluster on Ubuntu Virtual Machines"
+date: 2014-03-19
+permalink: "/writing/2014/march/hadoop-multi-node/"
+category: "technology"
+description: "Cloning the VM, wiring master and slave, and starting a real cluster."
+---
+
+<p>If you've landed on this page, I know your feelings. Wanna know how it feels when it's done? Ride on, it's like Roller Coaster...</p>
+
+<p>You have successfully configured a single-node cluster in 7 easy steps. Good! But you are yet to taste the real essence of Hadoop. Recall that the primary purpose of Hadoop is to distribute a very lengthy task to more than one machines. This is exactly what we are going to do, but the only difference is that we will be doing so in Virtual machines.</p>
+
+<h2>Step 1: Networking</h2>
+
+<figure class="post-figure">
+  <img src="{{ '/assets/img/writing/hadoop-multi-node/01.png' | relative_url }}"
+       alt="" width="724" height="327" loading="lazy" decoding="async">
+</figure>
+
+<figure class="post-figure">
+  <img src="{{ '/assets/img/writing/hadoop-multi-node/02.png' | relative_url }}"
+       alt="" width="724" height="103" loading="lazy" decoding="async">
+</figure>
+
+<figure class="post-figure">
+  <img src="{{ '/assets/img/writing/hadoop-multi-node/03.png' | relative_url }}"
+       alt="" width="657" height="420" loading="lazy" decoding="async">
+</figure>
+
+<figure class="post-figure">
+  <img src="{{ '/assets/img/writing/hadoop-multi-node/04.png' | relative_url }}"
+       alt="" width="724" height="250" loading="lazy" decoding="async">
+</figure>
+
+<figure class="post-figure">
+  <img src="{{ '/assets/img/writing/hadoop-multi-node/05.png' | relative_url }}"
+       alt="" width="724" height="354" loading="lazy" decoding="async">
+</figure>
+
+<p>We have several things to do first with the existing VM, beginning with disabling IPv6. This is a recommendation because Hadoop currently does not support IPv6 according to their official Wiki. In order to do so, you will have to modify a fine named /etc/sysctl.conf:</p>
+
+<ul>
+  <li>Launch your Virtual Machine from Virtualbox</li>
+  <li>Open your terminal and run:</li>
+</ul>
+
+<pre><code>$ sudo nano /etc/sysctl.conf</code></pre>
+
+<p>- Add the following lines at the end of the file:</p>
+
+<pre><code># Disable ipv6
+net.ipv6.conf.all.disable_ipv6 = 1
+net.ipv6.conf.default.disable_ipv6 = 1
+net.ipv6.conf.lo.disable_ipv6 = 1</code></pre>
+
+<ul>
+  <li>Now you'll have to reboot the machine. Sorry :(</li>
+  <li>Run the following command to check if IPv6 is really disabled:</li>
+</ul>
+
+<pre><code>$ cat /proc/sys/net/ipv6/conf/all/disable_ipv6</code></pre>
+
+<p>You should get 1 as output, meaning that IPv6 is disabled.</p>
+
+<p>Next, we change the Network Settings of Virtual Machine.</p>
+
+<ul>
+  <li>Go to Virtual Machine's Menu &gt; Devices &gt; Network Settings..</li>
+  <li>Change the Network Attached to from NAT to Bridged Adapter and choose your Network Adapter from below. Mine is as shown in the image.</li>
+</ul>
+
+<p>Now we change our Ubuntu's IP addressing from Dynamic to Static. This is because we will be using fixed IPs:</p>
+
+<ul>
+  <li>On your Ubuntu's desktop, open Networks window from Top-Right menu by Clicking Edit Connections</li>
+  <li>From the same menu, also open Connection Information. This is handy to enter correct settings</li>
+  <li>Edit the only connection (if you have multiple, you may want to remove the ones not in use)</li>
+  <li>Go to IPv4 Settings and Changed the Method to Manual</li>
+  <li>Add a new Address by looking at the Connection Information. You should change the last number to something like 10, 50, or 100</li>
+  <li>Gateway and Netmask should remain similar to that of Connection Information</li>
+  <li>Save the Settings and Close; the Network should refresh itself</li>
+</ul>
+
+<p>We are not done yet. We now need to define what our Master and Slave machines will be called (defining aliases) in the Network:</p>
+
+<p>- On terminal run:</p>
+
+<pre><code>$ sudo nano /etc/hosts</code></pre>
+
+<p>- Replace the local address from 127.0.0.1 localhost to your machine's IP address and call it master</p>
+
+<pre><code>192.168.0.50 master</code></pre>
+
+<p>- Also, comment out all the lines below, which are related to IPv6</p>
+
+<p>- Change localhost to master. This will make your first line look like:</p>
+
+<pre><code>192.168.0.50 master</code></pre>
+
+<p>- Add another like for slave:</p>
+
+<pre><code>192.168.0.51 slave</code></pre>
+
+<p>Recall that in our single-node set up, we configured some xml files and defined the machine's name as localhost. Well! We'll have to change the localhost to master now:</p>
+
+<p>- Edit the core-site.xml</p>
+
+<pre><code>$ sudo nano /usr/local/hadoop/conf/core-sites.xml</code></pre>
+
+<p>- Change localhost to master</p>
+
+<ul>
+  <li>Save and exit</li>
+  <li>Now edit the mapred-site.xml in similar way</li>
+</ul>
+
+<pre><code>$ sudo nano /usr/local/hadoop/conf/mapred-sites.xml</code></pre>
+
+<ul>
+  <li>Change localhost to master</li>
+  <li>Save and exit</li>
+</ul>
+
+<p>Finally, shut down the machine. We have to clone it</p>
+
+<h2>Step 2: Cloning Virtual Machine</h2>
+
+<p>Thanks to VirtualBox's built-in features that we won't have to create another machine from the scratch:</p>
+
+<ul>
+  <li>Right click on Hadoop VM &gt; Clone</li>
+  <li>Name the new machine Hadoop Clone</li>
+  <li>Next, choose Full clone</li>
+  <li>Next, choose Current machine state and Clone</li>
+</ul>
+
+<figure class="post-figure">
+  <img src="{{ '/assets/img/writing/hadoop-multi-node/06.png' | relative_url }}"
+       alt="" width="683" height="481" loading="lazy" decoding="async">
+</figure>
+
+<p>You may want to check this if you encounter problems.</p>
+
+<p>After completion, launch both Virtual Machines. But please watch your memory resources, if you have a total of 4GB, then reduce the size of both VMs' memories to 1GB each in their settings.</p>
+
+<p>Log into both machines and following the steps of change the IP address of newly created clone from 192.168.0.50 to 192.168.0.51 (or whatever you have to set). Wait until the Network refreshes.</p>
+
+<p>This clone is your original machine's Slave. Now we need to define hostname for both machines. Edit the file /etc/hostname. Run:</p>
+
+<pre><code>$ sudo nano /etc/hostname</code></pre>
+
+<p>- Change localhost to master on your master machine and to slave on your slave machine</p>
+
+<figure class="post-figure">
+  <img src="{{ '/assets/img/writing/hadoop-multi-node/07.png' | relative_url }}"
+       alt="" width="724" height="106" loading="lazy" decoding="async">
+</figure>
+
+<ul>
+  <li>Save and Exit</li>
+  <li>Restart both machines to apply changes</li>
+</ul>
+
+<h2>Step 3: Connectivity</h2>
+
+<figure class="post-figure">
+  <img src="{{ '/assets/img/writing/hadoop-multi-node/08.png' | relative_url }}"
+       alt="" width="724" height="293" loading="lazy" decoding="async">
+</figure>
+
+<figure class="post-figure">
+  <img src="{{ '/assets/img/writing/hadoop-multi-node/09.png' | relative_url }}"
+       alt="" width="724" height="170" loading="lazy" decoding="async">
+</figure>
+
+<p>We need to ensure that SSH access is available from master to slave. On master, we already have SSH configured, but we will need to regenerate SSH key on slave machine because it is a clone of master and we should always have a unique key for machines.</p>
+
+<p>- In both master and slave machine, clear existing files from /home/hadoop/.ssh directory</p>
+
+<pre><code>$ sudo rm /home/hadoop/.ssh/*</code></pre>
+
+<p>- Now generate a new public key for SSH. For details, check step 3 here</p>
+
+<pre><code>$ ssh-keygen -t rsa -P ""</code></pre>
+
+<p>- Copy the key to authorized_keys list</p>
+
+<pre><code>$ cat /home/hadoop/.ssh/id_rsa.pub &gt;&gt; /home/hadoop/.ssh/authorized_keys</code></pre>
+
+<p>- Try the SSH to master from master and slave from slave itself:</p>
+
+<p>On master</p>
+
+<pre><code>$ ssh master
+On slave
+$ ssh slave</code></pre>
+
+<p>If you experience having to write password because of "Agent admitted failure to sign using the key" error on any of the machines, then you'll have to run the following command to fix it:</p>
+
+<pre><code>$ ssh-add</code></pre>
+
+<p>We will have to copy the master's public key to slave machine as well. On master, run:</p>
+
+<pre><code>$ ssh-copy-id -i /home/hadoop/.ssh/id_rsa.pub hadoop@slave</code></pre>
+
+<p>You will be asked for slave's password to continue (this should be same as master's if you haven't changed explicitly).</p>
+
+<p>We should now be able to connect to slave from master. Why not try out? Run:</p>
+
+<pre><code>$ ssh slave</code></pre>
+
+<p>You should see a successful connection if nothing went wrong.</p>
+
+<p>- Exit the SSH connection to slave:</p>
+
+<pre><code>$ exit</code></pre>
+
+<h2>Step 4: Configuring Hadoop Resources</h2>
+
+<figure class="post-figure">
+  <img src="{{ '/assets/img/writing/hadoop-multi-node/10.png' | relative_url }}"
+       alt="" width="724" height="105" loading="lazy" decoding="async">
+</figure>
+
+<figure class="post-figure">
+  <img src="{{ '/assets/img/writing/hadoop-multi-node/11.png' | relative_url }}"
+       alt="" width="724" height="122" loading="lazy" decoding="async">
+</figure>
+
+<figure class="post-figure">
+  <img src="{{ '/assets/img/writing/hadoop-multi-node/12.png' | relative_url }}"
+       alt="" width="724" height="283" loading="lazy" decoding="async">
+</figure>
+
+<p>We will run all services on Master node and only TaskTracker and DataNode on slave machines; on large-scale deployments, you may be running Secondary Namenodes and also, may not be running TaskTracker and DataNode on master (when master is dedicated for task assignments only, not executing). We will define which machine will be actual master for Hadoop and which ones will be Slaves (or workers).</p>
+
+<p>- In your master machine, edit the /usr/local/hadoop/conf/masters file:</p>
+
+<pre><code>$ sudo nano /usr/local/hadoop/conf/masters</code></pre>
+
+<p>- Write master</p>
+
+<ul>
+  <li>Save and exit</li>
+  <li>In same machine, edit the /usr/local/hadoop/conf/slaves file:</li>
+</ul>
+
+<pre><code>$ sudo nano /usr/local/hadoop/conf/slaves</code></pre>
+
+<p>- Write master in first line and slave in second</p>
+
+<p>- Save and exit</p>
+
+<p>Since we have 2 machines now, we can enable replication in hdfs-site.xml</p>
+
+<pre><code>$ sudo nano /usr/local/hadoop/conf/hdfs-site.xml</code></pre>
+
+<p>- Change the value to 2</p>
+
+<p>- Save and exit</p>
+
+<h2>Step 5: Invoking Demons</h2>
+
+<figure class="post-figure">
+  <img src="{{ '/assets/img/writing/hadoop-multi-node/13.png' | relative_url }}"
+       alt="" width="724" height="463" loading="lazy" decoding="async">
+</figure>
+
+<figure class="post-figure">
+  <img src="{{ '/assets/img/writing/hadoop-multi-node/14.png' | relative_url }}"
+       alt="" width="598" height="160" loading="lazy" decoding="async">
+</figure>
+
+<figure class="post-figure">
+  <img src="{{ '/assets/img/writing/hadoop-multi-node/15.png' | relative_url }}"
+       alt="" width="597" height="154" loading="lazy" decoding="async">
+</figure>
+
+<figure class="post-figure">
+  <img src="{{ '/assets/img/writing/hadoop-multi-node/16.png' | relative_url }}"
+       alt="" width="598" height="113" loading="lazy" decoding="async">
+</figure>
+
+<p>Format the HDFS file system first:</p>
+
+<pre><code>$ hadoop namenode -format</code></pre>
+
+<p>- Start Namenode, Secondary Namenode and JobTracker on master and Datanode and TaskTracker on both master and slave</p>
+
+<pre><code>$ start-all.sh</code></pre>
+
+<p>- Run Jps utility on master to check running services:</p>
+
+<pre><code>$ jps</code></pre>
+
+<p>- Similarly, run Jps utility on check to check running services:</p>
+
+<pre><code>$ jps</code></pre>
+
+<p>Important! If you see Datanode service not running on any of the machines, then retry this whole step after rebooting the machine that is missing it. If the problem still persists, you'll have to look deeper. Open the Datanode log of the machine:</p>
+
+<pre><code>$ sudo nano /usr/local/hadoop/logs/hadoop-hadoop-datanode-slave.log (or master.log)</code></pre>
+
+<p>If you find a java.io.IOException, saying Incompatible namespaceIDs. Then you'll have to manually correct the datanode namespace ID; this should be identical to the ID. Look for the namenode namespace ID and replace it in your dfs directory (this is defined in hdfs-sites.xml as a property, but in our case, this should be in /home/hadoop/tmp/dfs/data/current/VERSION</p>
+
+<figure class="post-figure">
+  <img src="{{ '/assets/img/writing/hadoop-multi-node/17.png' | relative_url }}"
+       alt="" width="598" height="463" loading="lazy" decoding="async">
+</figure>
+
+<figure class="post-figure">
+  <img src="{{ '/assets/img/writing/hadoop-multi-node/18.png' | relative_url }}"
+       alt="" width="652" height="212" loading="lazy" decoding="async">
+</figure>
+
+<p>- Now stop and start all service on master</p>
+
+<pre><code>$ stop-all.sh
+$ start-all.sh</code></pre>
+
+<h2>Step 6: Executing MapReduce Application</h2>
+
+<p>We will try the same word count example. On master</p>
+
+<ul>
+  <li>Copy some more text files in the /home/hadoop/Documents/books (assuming you have already run this example previously)</li>
+  <li>Copy the files in HDFS. Run:</li>
+</ul>
+
+<pre><code>$ hadoop dfs -copyFromLocal /home/hadoop/Documents/books /HDFS/books</code></pre>
+
+<p>Important! If you see a SafeModeException that are keeping the files from copying, turn off the Hadoop safe mode by running:</p>
+
+<pre><code>$ hadoop dfsadmin -safemode leave</code></pre>
+
+<p>You may require this because initially, Hadoop runs in fail safe mode and does not allow certain services. It then transitions into normal mode; this transitioning may not happen sometimes.</p>
+
+<figure class="post-figure">
+  <img src="{{ '/assets/img/writing/hadoop-multi-node/19.png' | relative_url }}"
+       alt="" width="832" height="373" loading="lazy" decoding="async">
+</figure>
+
+<p>- Run the wordcount example</p>
+
+<pre><code>$ hadoop jar $HADOOP_HOME/hadoop-examples-1.2.1.jar wordcount /HDFS/books /HDFS/books/output</code></pre>
+
+<p>- Collect the output:</p>
+
+<pre><code>$ hadoop dfs –getmerge /HDFS/books/output $HOME/Documents/books/</code></pre>
+
+<h2>Step 7: Tracking the Progress</h2>
+
+<p>You can track the status of NameNode on your browser master:50070</p>
+
+<p>The MapReduce tasks on different nodes can be seen on master:50030</p>
+
+<p>At this point, if you're not feeling like praying, or give a hug to the person sitting next to you, or dancing on the table, then you have no emotion.. :-|</p>
+
+<p>End Note:</p>
+
+<p>If you have arrived to here seamlessly, or with some glitches that you were able to fix by yourself, then you can certainly deploy a multi-node cluster with more than 2 nodes in real World with little effort. I would still recommend to try to extend the existing set up to 3 nodes and maybe on multiple Virtual Machines on different Physical Machines. You may also try to run your own applications via Eclipse on larger data sets to enjoy real Hadoop experience.</p>
+
+<p>Happy Hadooping...</p>
+
+<p>* All the experiments were performed on my Lenovo Ideapad U510 laptop with moderate specifications.</p>
+
+<p>* If you find some images not being displayed (I have absolutely no idea why this happens), I have put them here for download.</p>

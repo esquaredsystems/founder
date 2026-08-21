@@ -1,0 +1,153 @@
+---
+title: "Logging with MySQL"
+date: 2012-12-27
+permalink: "/writing/2012/december/logging-with-mysql/"
+category: "technology"
+description: "What MySQL logging costs you, and four ways to keep the bill down."
+---
+
+<pre><code># Be aware that this log type is a performance killer.</code></pre>
+
+<p>I read this line from configuration file of MySQL, when trying to enable disabled-by-default general logging option for MySQL Server, in Linux. I decided to dig in deep and find out why? And what are the alternatives?</p>
+
+<h2>Performance loss:</h2>
+
+<p>If you enable MySQL logging, you'll notice instant drop in performance if you are dealing with large data, being manipulated by over a dozen connections. The primary reason for this is the IO operation after every database event; if the database repository and log files are on the same storage device, the performance reduces even more due to the simultaneous write operations (not to forget that write is more expensive than read). Secondarily, the size of the log file is from 4 to 20 times than actual data, depending on the architecture of data feeding application (you try this yourself). This is because the file contains not only the actual values present in the data, but also the queries it used. So a table with columns, say: ID, Name and Gender may contain:</p>
+
+<pre><code>1 ALI M
+2 OWAIS M
+3 FATIMA F</code></pre>
+
+<p>But the general log file is going to look like:</p>
+
+<pre><code>95 Connect   root@localhost on
+95 Query     set autocommit=1
+95 Query     SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ
+95 Query     SHOW SESSION VARIABLES LIKE 'lower_case_table_names'
+95 Query     SET CHARACTER SET utf8
+95 Query     SET NAMES utf8
+95 Query     SET SQL_SAFE_UPDATES=1
+95 Query     SELECT CONNECTION_ID()
+95 Query     SELECT current_user()
+95 Query     USE `test`
+95 Query     set autocommit=1
+95 Query     SHOW SESSION VARIABLES LIKE 'sql_mode'
+95 Query     SELECT current_user()
+121218 18:25:49    94 Query     SHOW TRIGGERS FROM `test` LIKE 'test'
+94 Query     SHOW INDEXES FROM `test`.`test`
+94 Query     SHOW CREATE TABLE `test`.`test`
+94 Query     SHOW FULL COLUMNS FROM `test`.`test`
+121218 18:26:03    95 Query     insert into test.test (id, name, gender) values (1, 'ALI', 'M')
+95 Query     SHOW WARNINGS
+121218 18:26:04    95 Query     insert into test.test (id, name, gender) values (2, 'OWAIS', 'M')
+95 Query     SHOW WARNINGS
+121218 18:26:05    95 Query     insert into test.test (id, name, gender) values (3, 'FATIMA', 'F')
+95 Query     SHOW WARNINGS</code></pre>
+
+<p>Now think of reproducing the example for a web application, making a HTTP call that might be calling 5 queries.</p>
+
+<p>Another addition to this is the SELECT queries, that have nothing to do with data modification but are still logged. The use of such logging is minimal, as compared to the DML queries. Not only this, some applications use standards and frameworks, which generate fully-qualified queries; "Hibernate" framework for Object-Relation Mapping is an example. The cost of logging fully-qualified queries is high, take an example:</p>
+
+<p>Query with aliases:</p>
+
+<pre><code>select t.id, t.name, t.gender from test as t</code></pre>
+
+<p>Fully-qualified query:</p>
+
+<pre><code>select `test`.`id`, `test`.`name`, `test`.`gender` from `mydb`.`test`</code></pre>
+
+<h2>Logging Types:</h2>
+
+<p>MySQL has multiple ways to handle logs, depending on the query types and responses:</p>
+
+<p>Error Log: contains critical errors that occur during starting and stopping mysqld, the MySQL Server's executable.</p>
+
+<p>General Query Log: contains activities performed during the execution of mysqld; in other words, it is use used to keep track of MySQL client activities. These activities are logged as they are received.</p>
+
+<p>Binary Log: a binary file - unlike General Query Log file, which is text - containing activities that change database and its schema. These activities are logged after their execution.</p>
+
+<p>Slow-query Log: consists of queries that take time longer than specified (set in variable long_query_time in configuration file.</p>
+
+<h2>Solutions:</h2>
+
+<h2>Using Existing Application/Web Server Logs</h2>
+
+<p>Every appropriately designed application logs its activities to some extent; also, if your application is hosted on a web server, like Tomact or IIS, it too will have its own logging mechanism. You can use these logs to track the database activities and keep the database logs disabled.</p>
+
+<p>Note that this will work only when logs are not read on regular basis because then, you'll have to write a parser to extract useful information from the log for quick readability; the cost of the extraction process will be another addition, so choose this option carefully. Also, if more than one projects are being hosted on the same web server, then this solution may not suit because a single log file will contain a mix of activities from all the applications unless you configure your web server to log every application on a separate file.</p>
+
+<h2>Logging into MySQL Tables</h2>
+
+<p>MySQL Server allows to log the activities into database instead of a file. You can configure this option in configuration file by setting variable log-output = TABLE (or adding this line if it doesn't exist, it should be set to FILE by default).</p>
+
+<p>Doing so will record the logs in separate tables for each type of log in mysql schema.</p>
+
+<h2>Using stored procedures</h2>
+
+<p>MySQL Server only logs the direct statements executed. If you have queries that execute in batches, it is better for logging efficiency to put them in stored procedures.</p>
+
+<h2>Log maintenance using scheduled jobs</h2>
+
+<p>By using MySQL Events or OS tasks like cronjob, you can archive old logs as well as remove unwanted queries. Here is an example using MySQL events:</p>
+
+<p>First, make sure Event Scheduler is enabled by adding event-scheduler variable (if it doesn't exist). This requires restarting the MySQL Server:</p>
+
+<pre><code>event-scheduler = ON</code></pre>
+
+<p>Now create event:</p>
+
+<pre><code>DELIMITER $$
+CREATE EVENT `log_maintenance` ON SCHEDULE EVERY 1 WEEK
+DO BEGIN
+CREATE TABLE IF NOT EXISTS mysql.general_log_archive LIKE mysql.general_log;
+INSERT INTO mysql.general_log_archive
+SELECT * FROM mysql.general_log;
+TRUNCATE mysql.general_log;
+CREATE TABLE IF NOT EXISTS mysql.slow_log_archive LIKE mysql.slow_log;
+INSERT INTO mysql.slow_log_archive
+SELECT * FROM mysql.slow_log;
+TRUNCATE mysql.slow_log;
+END
+$$ DELIMITER ;</code></pre>
+
+<p>The event will fire like a Trigger (in fact, events are temporal triggers) on its start time.</p>
+
+<h2>Tuning up more</h2>
+
+<p>- Limiting Databases: setting binlog-do-db variable in config file will limit logging to only the databases listed. You can define this like:</p>
+
+<pre><code>binlog-do-db = test
+binlog-do-db = mysql
+binlog-do-db = my_db</code></pre>
+
+<p>- Indexing: certain columns can be indexed to improve querying, like:</p>
+
+<pre><code>ALTER TABLE mysql.general_log ADD INDEX (event_time);</code></pre>
+
+<pre><code>ALTER TABLE mysql.slow_log ADD INDEX (db);</code></pre>
+
+<p>- Convert log table(s) to MyISAM: since MyISAM storage engine is a better option for huge data, you may convert the engine of log tables to MyISAM. Example:</p>
+
+<pre><code>ALTER TABLE mysql.slow_log ENGINE = MyISAM;</code></pre>
+
+<p>Query Results:</p>
+
+<p>I performed some experiments using 30,000 INSERT, UPDATE and DELETE queries on random data to illustrate the difference in performance with and without logging:</p>
+
+<ul>
+  <li>Logging disabled: 138 sec</li>
+  <li>General Log enabled on File: 139 sec</li>
+  <li>General Log enabled on Table: 141 sec</li>
+  <li>Binary Logging enabled on File: 165 sec</li>
+  <li>Binary Logging enabled on Table: 143 sec</li>
+  <li>All Logs (General, Binary, Error, Slow-query) enabled on File: 174 sec</li>
+  <li>All Logs (General, Binary, Error, Slow-query) enabled on Table: 152 sec</li>
+</ul>
+
+<p>Below are the results of a larger number of queries on a real data:</p>
+
+<ul>
+  <li>Logging disabled: 335 sec</li>
+  <li>All Logs (General, Binary, Error, Slow-query) enabled on File: 432 sec</li>
+  <li>All Logs (General, Binary, Error, Slow-query) enabled on Table: 422 sec</li>
+</ul>

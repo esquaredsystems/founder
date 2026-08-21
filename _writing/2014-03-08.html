@@ -1,0 +1,88 @@
+---
+title: "Executing MapReduce Applications on Hadoop (Single-node Cluster) - Part 1"
+date: 2014-03-08
+permalink: "/writing/2014/march/mapreduce-part-1/"
+category: "technology"
+description: "Part 1: the Hadoop services, and the built-in Word Count example."
+---
+
+<p>Okay. You just set up Hadoop on a single node on a VM and now wondering what comes next. Of course, you’ll run something on it, and what could be better than your own piece of code? But before we move to that, let’s first try to run an existing program to make sure things are well set on our Hadoop cluster.</p>
+
+<p>Power up your Ubuntu with Hadoop on it and on Terminal (Ctrl+Alt+T) run the following command:</p>
+
+<pre><code>$ start-all.sh</code></pre>
+
+<p>Provide the password whenever asked and when all the jobs have started, execute the following command to make sure all the jobs are running:</p>
+
+<pre><code>$ jps</code></pre>
+
+<p>Note: The “jps” utility is available only in Oracle JDK, not Open JDK. See, there are reasons it was recommended in the first place.</p>
+
+<p>You should be able to see the following services:</p>
+
+<pre><code>NameNode
+SecondaryNameNode
+DataNode
+JobTracker
+TaskTracker
+Jps</code></pre>
+
+<figure class="post-figure">
+  <img src="{{ '/assets/img/writing/mapreduce-part-1/01.png' | relative_url }}"
+       alt="" width="697" height="391" loading="lazy" decoding="async">
+</figure>
+
+<p>We'll take a minute to very briefly define these services first.</p>
+
+<p>NameNode: a component of HDFS (Hadoop File System) that manages all the file system metadata, links, trees, directory structure, etc. You can track the status of NameNode on http://localhost:50070 in the browser of your machine (localhost can be some other address if you are not using standalone deployment).</p>
+
+<p>SecondaryNameNode: no. This is not a backup, or replica of NameNode. The primary responsibility of SecondaryNameNode is maintaining the logs created by NameNode, since the size of the logs can become huge.</p>
+
+<p>DataNode: this one handles the actual data. In a multi-node cluster, you may have more DataNodes. You make changes to the DataNode via NameNode.</p>
+
+<p>JobTracker: this service relates to MapReduce jobs. It keeps the jobs given to Hadoop from client for processing. It talks to NameNode to find relevant data, then looks for most appropriate nodes in the cluster to assign tasks to. Additionally, it reassigns tasks when a node fails to do it. The status of JobTracker can be viewed on http://localhost:50030</p>
+
+<p>TaskTracker: a node in the cluster that does the Map, Reduce and Shuffle operations assigned to it by JobTracker. It keeps sending Heartbeat messages to JobTracker to inform about its status.</p>
+
+<p>Enough theory, let’s get back to real stuff.</p>
+
+<p>We will begin with example of Word Count, provided with Hadoop and see how it goes. This utility does nothing fancy; it counts the number of occurrence of each word in a bunch of text files. Here are the steps to do so:</p>
+
+<figure class="post-figure">
+  <img src="{{ '/assets/img/writing/mapreduce-part-1/02.png' | relative_url }}"
+       alt="" width="802" height="579" loading="lazy" decoding="async">
+</figure>
+
+<p>Fetch some plain text files (novels recommended), create a directory “books” in your Documents and copy these files in it. I’ll be using some novels of Sherlock Holmes I downloaded from http://www.readsherlock.com, but you can use any text files.</p>
+
+<figure class="post-figure">
+  <img src="{{ '/assets/img/writing/mapreduce-part-1/03.png' | relative_url }}"
+       alt="" width="724" height="463" loading="lazy" decoding="async">
+</figure>
+
+<p>Copy these files into HDFS using dfs utility:$ hadoop dfs –copyFromLocal $HOME/Documents/books /HDFS/books</p>
+
+<p>Confirm that these files have been copied using ls command</p>
+
+<pre><code>$ hadoop dfs –ls /HDFS/books</code></pre>
+
+<p>Finally, execute the example jar file given in Hadoop examples:</p>
+
+<pre><code>$ hadoop jar $HADOOP_HOME/hadoop-examples-1.2.1.jar wordcount /HDFS/books /HDFS/books/output</code></pre>
+
+<figure class="post-figure">
+  <img src="{{ '/assets/img/writing/mapreduce-part-1/04.png' | relative_url }}"
+       alt="" width="832" height="571" loading="lazy" decoding="async">
+</figure>
+
+<p>The MapReduce Job “wordcount” in the hadoop-examples jar will execute, pick the text files from /HDFS/books, count the occurrence of each unique word and write the output to /HDFS/books/output. You should also check the following on your web browser to trace the Job’s statuses:</p>
+
+<pre><code>http://localhost:50070
+http://localhost:50060
+http://localhost:50030</code></pre>
+
+<p>In order to collect the output file, run the following command:</p>
+
+<pre><code>$ hadoop dfs –getmerge /HDFS/books/output $HOME/Documents/books/</code></pre>
+
+<p>The output file should now be in your Documents/books directory in readable form.</p>

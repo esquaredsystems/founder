@@ -1,0 +1,499 @@
+---
+title: "Yet another Blog on Query Optimization for MySQL Server"
+date: 2012-06-11
+permalink: "/writing/2012/june/mysql-query-optimization/"
+category: "technology"
+description: "Storage engines, indexes, joins, grouping, views — measured, not guessed."
+---
+
+<p>If you have been into MIS development for some time, then you may have realized that buying latest, multi-thousand-dollar Machine, stuffed with a top notch processor and an army of memory chips is not sufficient to your needs when it comes to processing large data, especially when your DBMS is MySQL Server.</p>
+
+<p>In this article, I have tried to input the tips and techniques to-be-followed - some in general and some specific to MySQL Server; but I would, as every blogger, repeat the same common phrase that "in the end it all depends on your scenario".</p>
+
+<p>The results you are going to see will mostly be in milliseconds so before thinking "is it worth the effort if the result is in a few milliseconds?", do know that these results are derived using a very very simple database with not more than 100000 records in a table. With complex databases and records in millions, the effort will pay you back.</p>
+
+<p>Coming straight to topic, here are some points you should not ignore when designing tables and writing queries for retrieving data.</p>
+
+<h2>Choosing storage Engine</h2>
+
+<p>MySQL is unique in a way that it offers different Engines for storage. The two mostly used are InnoDB and MyISAM. When designing tables, choosing appropriate storage engine serves you as lifesaver afterwards.</p>
+
+<p>The most significant differences between InnoDB and MyISAM are that InnoDB supports transactions, foreign keys, row locks, data caches and clustered indexes; it serves best for Insert, Update and Delete operations, more controlled locking, and maintaining referential integrity.</p>
+
+<p>On the other hand, MyISAM, in comparison supports full-text indexing and 4x storage capacity i.e. 256TB (to date), while it: lacks foreign key support; is limited to table locks; misses data caching.</p>
+
+<p>Shortly, InnoDB should be selected for a table when DML operations are more frequent than Select, not because of speed but reliability and durability. While MyISAM is best for data warehouse. More precisely, for tables used for search and reporting purpose.</p>
+
+<h2>Indexing and Primary Key</h2>
+
+<p>Indexing is a method to sort a number of records into one or more columns. The Index itself works as representative of records in a table; it can be created from one or more columns, and functions as a pointer to the records it's related to. When you define primary key for a table, a primary key index is created automatically by DBMS.</p>
+
+<p>Although creating indexes boosts up data read performance, remember that each index you create requires some additional disk space and the write performance decreases as the number of indexes grow.</p>
+
+<p>Below is an experiment on read/write performance in indexed and non-indexed tables.</p>
+
+<pre><code>create table person
+(
+id int(11),
+name char(50),
+nic varchar(15)
+)   engine = MYISAM;</code></pre>
+
+<pre><code>create table contact
+(
+id int(11),
+contact varchar(20)
+)   engine = MYISAM;</code></pre>
+
+<p>Important: Execute the command below to turn off query caching to evaluate actual query execution time.</p>
+
+<pre><code>set session query_cache_type = off;
+insert into person values (... Random 10000 records ...);</code></pre>
+
+<p>Result: 2821ms</p>
+
+<pre><code>insert into contact
+select id, [Random number]) as contact from person;</code></pre>
+
+<p>Result: 12ms</p>
+
+<pre><code>select p.name, c.contact from person as p inner join contact as c using (id) limit 10000;</code></pre>
+
+<p>Result: 5.241sec</p>
+
+<p>Now creating primary keys on both tables.</p>
+
+<pre><code>alter table person change column id id int(11) not null, add primary key (id);
+alter table contact change column id id int(11) not null, add primary key (id);</code></pre>
+
+<p>Trying the same queries after truncating both tables first.</p>
+
+<pre><code>insert into person values (... Random 10000 records ...);</code></pre>
+
+<p>Result: 2862ms</p>
+
+<pre><code>insert into contact
+select id, [Random number]) as contact from person;</code></pre>
+
+<p>Result: 34ms</p>
+
+<pre><code>select p.name, c.contact from person as p inner join contact as c using (id) limit 10000;</code></pre>
+
+<p>Result: 0.078sec</p>
+
+<p>You may notice little in insert, but dramatic change in select query after indexing by creating primary key.</p>
+
+<p>Talking about Primary keys, there is a misconception that INT data type works faster than char or equivalent. Here is an experiment proving it false.</p>
+
+<pre><code>alter table person change column id id char(11) not null;
+alter table contact change column id id char(11) not null;</code></pre>
+
+<pre><code>select p.name, c.contact from person as p inner join contact as c using (id) limit 10000;</code></pre>
+
+<p>Result: 0.078sec (same result)</p>
+
+<p>It doesn't really matter what data type you choose, but the length of data itself. The length should be chosen very carefully, tying best to keep it low. You don't want to keep your Primary Key column(s) BIGINT unless you are willing to register every person, animal, fish and tree on the planet to your system.</p>
+
+<h2>Writing Select Statement</h2>
+
+<p>Not something to mention, the primary purpose of a Database isn't to pushing data in, in fact the data never read shouldn't have been there in the first place; you retrieve the data in chunks and bulks, of various combinations, in various dimensions. You do so most of the time using Select query. So, in abstract, the efficiency of your data retrieval  - secondarily, after design - depends upon how beautifully you write your Select queries.</p>
+
+<h2>Avoid Select * ...</h2>
+
+<p>I know I sound annoying but this is true. The more the number of columns, the more the DB Engine processes the bytes. This serves most in cases where you have full-text columns like Address, Password_Hint, Essay_on_National_Hero, etc. Restricting your columns to only needed relieves your processor, especially when "Fetching" data. Have a look at the results:</p>
+
+<p>Table schema (different from above example):</p>
+
+<pre><code>create table contact
+(
+PID varchar(12) not null,
+AddressHouse varchar(50),
+AddressStreet varchar(50),
+AddressState varchar(50),
+City varchar(50),
+Country varchar(50),
+Region varchar(50),
+Phone varchar(20),
+Mobile varchar(20),
+MobileOwner varchar(50),
+Email varchar(100),
+LocationLat float,
+LocationLon float,
+primary key (PID)
+) engine=MYISAM;</code></pre>
+
+<pre><code>create table person
+(
+PID varchar(12) not null,
+Salutation varchar(12),
+FirstName varchar(50),
+MiddleName varchar(50),
+LastName varchar(50),
+SurName varchar(50),
+GuardianName varchar(100),
+Gender char(1),
+DOB dateL,
+MaritalStatus varchar(12),
+NIC varchar(20),
+Religion varchar(12),
+Alive bit(1),
+Picture tinyblob,
+primary key  (PID)
+) engine=MYISAM;</code></pre>
+
+<p>Selecting...</p>
+
+<pre><code>select person.*, contact.* from person inner join contact using (id) limit 10000;</code></pre>
+
+<p>Result: Duration 0.094 sec. Fetched in 0.062 sec</p>
+
+<pre><code>select person.id, contact.contact from person inner join contact using (id) limit 10000;</code></pre>
+
+<p>Result: Duration 0.094 sec. Fetched in 0.016 sec</p>
+
+<h2>Choosing Base tables</h2>
+
+<p>Base tables are actually the tables from which Views are derived but here, what I mean is the first tables you define right after the term "from" in the Select statement, like select blah_blah from base_table. Other tables will be called Join tables.</p>
+
+<p>For example, if you want to retrieve a list of those names from person table for which the contact number in contact table ends on 9. What you would typically do would be something like:</p>
+
+<pre><code>select p.name, c.contact from person as p inner join contact as c using (id) where contact like '%9';</code></pre>
+
+<p>Result: 0.031sec</p>
+
+<p>Because Where clause is executed first, if you choose contact as your base table and person as join table, then you will have unnecessary records filtered out before the two tables are joined. Interchanging the positions of both the tables:</p>
+
+<pre><code>select p.name, c.contact from contact as c inner join person as p using (id) where c.contact like '%9';</code></pre>
+
+<p>Result: 0.015sec</p>
+
+<h2>Hierarchy of Joins</h2>
+
+<p>Following the above principle, correct placement of each join limits the data for next join. In addition, use the column(s) of table right before join table when joining instead of using Base table's columns throughout the list of joins. Here is an example:</p>
+
+<p>Adding some more tables:</p>
+
+<pre><code>create table mobile_sp
+(
+sp_id int(11),
+sp_name varchar(20) not null,
+prefix char(6),
+primary key (sp_id)
+) engine=MYISAM;</code></pre>
+
+<pre><code>create table person_mobile_sp
+(
+id int(11) not null,
+sp_id int(11) not null,
+primary key (id,sp_id)
+) engine=MYISAM;</code></pre>
+
+<p>Bad practice:</p>
+
+<pre><code>select a.id, a.name, b.contact, d.sp_name from person as a
+inner join contact as b on b.id = a.id
+inner join person_mobile_sp as c on c.id = a.id
+inner join mobile_sp as d on d.sp_id = c.sp_id;</code></pre>
+
+<p>Result: 0.140sec</p>
+
+<p>Good practice:</p>
+
+<pre><code>select a.id, a.name, b.contact, d.sp_name from person as a
+inner join contact as b on b.id = a.id
+inner join person_mobile_sp as c on c.id = b.id
+inner join mobile_sp as d on d.sp_id = c.sp_id;</code></pre>
+
+<p>Result: 0.125sec</p>
+
+<p>Avoid misusing outer joins, use straight joins and preferably inner joins wherever possible.</p>
+
+<p>To demonstrate this, first wipe off some records from person_job table:</p>
+
+<pre><code>delete from person_job where ...;</code></pre>
+
+<p>Bad Practice:</p>
+
+<pre><code>select p.name, j.designation from person as p left outer join person_job as j using (id) where j.designation is not null limit 100000;</code></pre>
+
+<p>Result: 0.141sec</p>
+
+<p>Good Practice:</p>
+
+<pre><code>select p.name, j.designation from person as p inner join person_job as j using (id)  limit 100000;</code></pre>
+
+<p>Result: 0.062sec</p>
+
+<h2>Writing Where clause</h2>
+
+<p>Last but not least, Where clause is where you should be focusing most when optimizing queries. There are various tips on how to organize where clause like:</p>
+
+<p>Order:</p>
+
+<p>... where gender = 'M and age &lt; 25 should be ordered as</p>
+
+<p>... where age &lt; 25 and gender = 'M'</p>
+
+<p>Because there are more chances of limiting number of records in age condition than gender.</p>
+
+<p>Note: Some clever DBMS's like Oracle do such optimization automatically. However, I am unsure that MySQL is in the list.</p>
+
+<p>Between:</p>
+
+<p>Using age between 13 and 19 is slightly better than age &gt;= 13 and age &lt;= 19</p>
+
+<p>IN vs EXISTSWhere exists (... sub-query ...) is more efficient than Where column_name in (... sub-query ...) when you must use sub-query.</p>
+
+<p>Wild characters:</p>
+
+<p>Learn to use ? and _ wild cards instead of functions like substring(column, 1, 5) = 'BLAAH'.</p>
+
+<p>Maths:</p>
+
+<p>Use and avoid calculations wisely. where weight in (60, 70, 80, 90, 100) should be transformed into where weight mod 10 = 1. Similarly, where (duration * 24 * 60) &gt; 7200 should be simplified as where duration &gt; 5</p>
+
+<h2>Grouping</h2>
+
+<p>Group by clause is used typically with an aggregate function like max(...), sum(...), etc. In a situation where you are applying one or more aggregate functions to your main query to create a summary of records, Group by clause saves your server from extra burden and you from headache. The example below shows how to avoid a sub-query by grouping:</p>
+
+<pre><code>select j.designation, (select min(annual_income) from person_job where designation = j.designation) as average from person_job as j;</code></pre>
+
+<p>Disastrous Result: 45.692sec</p>
+
+<pre><code>select j.designation, min(j.annual_income) as min_income from person_job as j group by j.designation;</code></pre>
+
+<p>Result: 0.015sec</p>
+
+<p>Now can imagine the same with max, count and sum functions added???</p>
+
+<h2>Use existing Function</h2>
+
+<p>The assumption that "the DBMS function is doing the same thing in the back-end that I am in my function" is fallacious; you don't know the back-end so don't predict. It is very essential for a query writer to learn using built-in aggregate functions for calculations than inventing.</p>
+
+<p>Have an example:</p>
+
+<pre><code>select j.designation, sum(j.annual_income) / count(id) as average from person_job as j group by j.designation;</code></pre>
+
+<p>Result: 0.031sec</p>
+
+<pre><code>select j.designation, avg(j.annual_income) as average from person_job as j group by j.designation</code></pre>
+
+<p>Result: 0.015sec</p>
+
+<p>And these get worse with dates, like: writing select substring(dob, 1, 4) as year instead of simply saying select year(dob) as year.</p>
+
+<h2>Difference between WHERE and HAVING</h2>
+
+<p>The only difference (which is a big one) between Where and Having is that Having clause is executed after data has been fetched, i.e. after Select query is executed. It works like filters and instead of column names, it uses aliases (if no alias is defined, column name is used).</p>
+
+<p>Example: We are interested in finding out for each vendor, the designations with average annual income greater than 500000:</p>
+
+<pre><code>select m.sp_id, j.designation, avg(j.annual_income) as average from person_mobile_sp as m
+where avg(j.annual_income) &gt; 500000
+inner join person_job as j using (id)
+group by m.sp_id, j.designation
+having average &gt; 500000;</code></pre>
+
+<p>Using Having instead of Where should give you false results but not vice-versa. So do not use Having for any other purpose.</p>
+
+<p>Choosing between Join and Sub-queryRule of thumb, when you want more than 1 column from a table, don't use a sub-query. However, sometimes you need to create a join with sub-query itself when a table is unavailable, but that again is a join. Look at the structure below:</p>
+
+<pre><code>select a.col1, b.col1, c.col1 from table_a as a</code></pre>
+
+<p>inner join table_b as b on b.id = a.id</p>
+
+<p>inner join (select id, col1, sum(col2) as total from table_c group by id, col1) as c on c.id = b.id</p>
+
+<p>Sub-queries can be used in situations where grouping is not desired and you want to apply an aggregate function on a separate table. For example, you want to write a query for each person with his id, name, designation, annual income, highest annual income for his designation, mobile service provider and total subscribers of his service provider:</p>
+
+<pre><code>select p.id, p.name, j.designation, j.annual_income,</code></pre>
+
+<p>(select max(annual_income) from person_job where designation = j.designation) as max_income,</p>
+
+<p>sp.sp_name, (select count(id) from person_mobile_sp where sp_id = m.sp_id) as total_subscribers from person as p</p>
+
+<p>inner join person_job as j on j.id = p.id</p>
+
+<p>inner join person_mobile_sp as m on m.id = p.id</p>
+
+<pre><code>inner join mobile_sp as sp on sp.sp_id = m.sp_id;</code></pre>
+
+<p>Result: Duration 14.758sec. Fetched in: 31.356sec</p>
+
+<p>Obviously, this is undesirable time for you so you optimize the query. Instead of writing sub-queries for aggregate functions, you can create a join with separate queries. Doing so, the tables will be created only once:</p>
+
+<pre><code>select p.id, p.name, j.designation, j.annual_income, a.max_income, sp.sp_name, b.total_subscribers from person as p</code></pre>
+
+<p>inner join person_job as j on j.id = p.id</p>
+
+<p>inner join person_mobile_sp as m on m.id = p.id</p>
+
+<p>inner join mobile_sp as sp on sp.sp_id = m.sp_id</p>
+
+<p>inner join (select designation, max(annual_income) as max_income from person_job group by designation) as a on a.designation = j.designation</p>
+
+<pre><code>inner join (select sp_id, count(id) as total_subscribers from person_mobile_sp group by sp_id) as b on b.sp_id = m.sp_id;</code></pre>
+
+<p>Result: 1.794sec</p>
+
+<h2>Views and Temporary Tables</h2>
+
+<p>Views are literally nothing other than Select statements stored for reuse. In MySQL, Views are handled using two Algorithms - Merge and Temptable, the third Undefined is a default option which leaves the job of choosing algorithm to DBMS. Merge algorithm cannot be used if the statement contains an aggregate function, sub-query, grouping or union.</p>
+
+<p>I prefer using Temporary tables instead of views because first, I, almost all the time need a separate data container when I have hard time with sub-queries, groups and aggregate functions (which Mege algorithm doesn't support) and secondly, I often need to define additional indices for better performance, something that cannot be done with views.</p>
+
+<p>For more on MySQL views, check this old-yet-useful blog on performance.</p>
+
+<p>Creating temporary tables is one of the best techniques in query optimization, not specific to MySQL but in general. And if you choose to create these in Memory, then the performance will be magical. The example below illustrates how useful Temporary tables can be:</p>
+
+<p>Our objective is to create a report for each person containing his id, contact no, name, mobile service provider, total subscriber of provider, job designation, annual income, minimum and maximum income for his designation and difference of his annual income from average annual income for his designation.</p>
+
+<p>Without using temporary tables or joins with queries, your server will weep like a starving baby:</p>
+
+<pre><code>select p.name, c.contact, sp.sp_name, (select count(id) from person_mobile_sp where sp_id = m.sp_id) as total_subscribers, j.designation, j.annual_income, (select min(annual_income) from person_job where designation = j.designation) as min_income, (select max(annual_income) from person_job where designation = j.designation) as max_income from person as p</code></pre>
+
+<p>inner join contact as c on p.id = c.id</p>
+
+<p>inner join person_job as j on p.id = j.id</p>
+
+<p>inner join person_mobile_sp as m on p.id = m.id</p>
+
+<pre><code>inner join mobile_sp as sp on m.sp_id = sp.sp_id;</code></pre>
+
+<p>Result: Duration 17.410sec. Fetched in 71.012sec</p>
+
+<p>* Note that I have excluded calculation of average because - as I said - my laptop almost started to weep</p>
+
+<p>Now using Temporary table</p>
+
+<pre><code>drop table if exists tmp_mobile_sp_count;
+create table tmp_mobile_sp_count
+select sp_id, count(id) as total_subscribers from person_mobile_sp
+group by sp_id;</code></pre>
+
+<p>Result: 0.203sec</p>
+
+<pre><code>drop table if exists tmp_designation_income;
+create table tmp_designation_income
+select designation, min(annual_income) as min_income, max(annual_income) as max_income, avg(annual_income) as average_income from person_job
+group by designation;</code></pre>
+
+<p>Result: 0.468sec</p>
+
+<pre><code>select p.name, c.contact, sp.sp_name, tm.total_subscribers, j.designation, j.annual_income, td.min_income, td.max_income, (j.annual_income - td.average_income) as difference_from_average from person as p
+inner join contact as c on p.id = c.id
+inner join person_job as j on p.id = j.id
+inner join person_mobile_sp as m on p.id = m.id
+inner join mobile_sp as sp on m.sp_id = sp.sp_id
+inner join tmp_mobile_sp_count as tm on sp.sp_id = tm.sp_id
+inner join tmp_designation_income as td on j.designation = td.designation limit 100000;</code></pre>
+
+<p>Result: Duration 0.016sec. Fetched in 0.296sec (for 9090 rows)</p>
+
+<p>Total Duration: 0.203 + 0.468 + 0.016 + 0.296 = 0.983sec</p>
+
+<p>But this is not end of the story, you can avoid using temporary tables if you are okay to trade simplicity with performance, by using the same method of creating joins from queries, which will be even faster. Look at the results below:</p>
+
+<pre><code>select p.name, c.contact, sp.sp_name, a.total_subscribers, j.designation, j.annual_income, b.min_income, b.max_income, (j.annual_income - b.average_income) as difference_from_average from person as p</code></pre>
+
+<p>inner join contact as c on p.id = c.id</p>
+
+<p>inner join person_job as j on p.id = j.id</p>
+
+<p>inner join person_mobile_sp as m on p.id = m.id</p>
+
+<p>inner join mobile_sp as sp on m.sp_id = sp.sp_id</p>
+
+<p>inner join (select sp_id, count(id) as total_subscribers from person_mobile_sp group by sp_id) as a on m.sp_id = a.sp_id</p>
+
+<pre><code>inner join (select designation, min(annual_income) as min_income, max(annual_income) as max_income, avg(annual_income) as average_income from person_job group by designation) as b on j.designation = b.designation;</code></pre>
+
+<p>Result: Duration 0.31sec. Fetched in 0.31sec</p>
+
+<p>So again when to use Temporary tables? The answer is simple: Not when the data inside the tables is not meant to be reused and not for jobs that can be done by Union. In our example, the tables we created may be used in other queries as well.</p>
+
+<p>An example of how Temporary tables can be avoided by using Union:</p>
+
+<p>Bad Practice:</p>
+
+<pre><code>create table tmp
+select a.col1, a.col2 from table_a as a;
+insert into tmp
+select b.col1, b.col2 from table_b as b
+where not exists (select col1 from table_a where col1 = b.col1);
+insert into tmp
+select c.col1, c.col2 from table_c as c</code></pre>
+
+<p>where not exists (select col1 from table_a where col1 = c.col1)</p>
+
+<pre><code>and not exists (select col1 from table_b where col1 = c.col1);</code></pre>
+
+<p>Good Practice:</p>
+
+<pre><code>select a.col1, a.col2 from table_a as a</code></pre>
+
+<p>union</p>
+
+<pre><code>select b.col1, b.col2 from table_b as b</code></pre>
+
+<p>union</p>
+
+<pre><code>select c.col1, c.col2 from table_c as c;</code></pre>
+
+<p>Keep in mind that Union gives you unique values only, for repeated values use Union all.</p>
+
+<p>Because use of temporary tables requires more than one statements to execute, a good way to organize these statements is creating a Stored Procedure and calling it from your code.</p>
+
+<h2>Problem with Update</h2>
+
+<p>In MySQL Server, performance of Update statement much slower than insert, so the idea of creating a temporary table with empty column and then updating this column using a bulk update query. Thinking that a sub-query in Select will be slower and divide the operation in parts is good in general, but disappointing in MySQL when one of the parts is Update statement.</p>
+
+<p>Lets take an example. You are willing to display for each person his name, his mobile service provider and total number of subscribers for his provider. Using the divide and conquer fall approach like above, you will have an unpleasant surprise:</p>
+
+<pre><code>drop table if exists tmp_person_subscriber;</code></pre>
+
+<pre><code>create table tmp_person_subscriber
+select p.name, sp.sp_id, sp.sp_name, 0 as total_subscribers from person as p
+inner join contact as c on p.id = c.id
+inner join person_mobile_sp as m on p.id = m.id
+inner join mobile_sp as sp on m.sp_id = sp.sp_id;</code></pre>
+
+<p>Result: 0.811sec</p>
+
+<pre><code>update tmp_person_subscriber as t
+set total_subscribers = (select count(id) from person_mobile_sp where sp_id = t.sp_id);</code></pre>
+
+<p>Result: 22.215sec</p>
+
+<p>Using direct approach:</p>
+
+<pre><code>select p.name, sp.sp_id, sp.sp_name, (select count(id) from person_mobile_sp where sp_id = m.sp_id) as total_subscribers from person as p
+inner join contact as c on p.id = c.id
+inner join person_mobile_sp as m on p.id = m.id
+inner join mobile_sp as sp on m.sp_id = sp.sp_id;</code></pre>
+
+<p>Result: Duration 1.358. Fetched in 0.655</p>
+
+<h2>Splitting the Time between Server and Client</h2>
+
+<p>In almost 9 out of 10 reports (my perception), you will be using a client-side application to retrieve queries instead of MySQL console or other Querying tools. You can save query time by shifting some load to client-end. Like if you are designing reports in a reporting tool like iReports, a Crystal Reports alternative, you can completely avoid:</p>
+
+<p>in-query calculations like date_diff(curdate(), date_of_birth), amount + (amount * 0.12), etc. by creating separate fields for these calculated values.</p>
+
+<p>grand aggregates like "sum of counts", "sum of sums", or "average of sums".</p>
+
+<p>Order by clause by sorting in the reporting tool</p>
+
+<p>There is more to the list, depending upon the tool you are using. But if your tool's name is like "[some super] Java IDE", "C++ Monster", "PHP Guru" (these are  fictitious so don't google them) or other programming interface, then I strictly advise to stick to query because besides the smartness of your Programming IDE, the way the data is handled through data structures of programming language is different than T-SQL, which are designed built to handle data.</p>
+
+<h2>When nothing works.. Warehouse does</h2>
+
+<p>Data Warehousing is (not exaggerating) the final solution to most of your complex reporting problems when you have a separate repository, containing all your historical data (NOT Live) and free hand to create as many tables - formally called Dimension tables and Fact tables in Data Warehousing language - in any way you like.</p>
+
+<p>Data Warehousing itself is a complete branch of Data reporting, which helps in massive analysis for decision making, including data mining.</p>
+
+<p>You can experiment this by creating a replica of your Transaction Database and deriving different tables for reporting purpose from it. This new warehouse can be fed new data after a specific interval of time (daily, weekly, or bi-weekly, etc.). However, the biggest setback for this is that you cannot use it for Live reporting like in Dashboards.</p>
+
+<p>Hope the blog helped you. The tips and hints are not cent percent guaranteed to work for you, but as I explained, it all depends on your application's architecture and preferences. Secondly, these are all from my own limited experience of Programming and query design.</p>
+
+<p>Note: All queries were tested on MySQL Workbench on my laptop equipped with Intel Core i3 M380@2.53GHz CPU and 4GB DDR3@1066MHz RAM, running MySQL Server 5.5 on Windows 7 Home Premium.</p>

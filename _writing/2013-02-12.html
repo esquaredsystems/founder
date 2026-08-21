@@ -1,0 +1,95 @@
+---
+title: "4-step configuration of SSL encryption on Tomcat in Ubuntu Linux using Self-Signed Certificate"
+date: 2013-02-12
+permalink: "/writing/2013/february/ssl-on-tomcat/"
+category: "technology"
+description: "A self-signed certificate, a connector, and a web.xml — SSL on Tomcat in four steps."
+---
+
+<p>First things first, the title makes it clear that the user is expected to know about terms SSL, Tomcat and Linux, so getting straight to the topic. The simple steps below can save hours of your time if you followed them sequentially.</p>
+
+<p>So, you have a web application ready to deploy and you want your communication to be entrypted and make sure that you are talking to the right server. Configuring SSL on your web server and application will do both the jobs for you in 4 steps below:</p>
+
+<h2>Creating dummy certificate</h2>
+
+<ul>
+  <li>Run: cd /usr/lib/jvm/java-6-openjdk-i386/jre/bin/</li>
+  <li>Run: keytool -genkeypair -alias MyCertificate -keyalg RSA -keystore "/home/myhome/MyCertificate.cert"</li>
+</ul>
+
+<p>Here, we used Java's keytool application to generate a self-signed certificate.</p>
+
+<p>Enter all the information asked further: password, name, organization, etc.</p>
+
+<p>This will generate a SSL certificate file, containing encrypted text.</p>
+
+<h2>Enabling SSL on your tomcat server</h2>
+
+<ul>
+  <li>Run: nano /var/lib/tomcat6/conf/server.xml</li>
+  <li>Search for commented block for configuring SSL HTTP connector (by default, it's on port 8443)</li>
+  <li>Uncomment the block and you should see:</li>
+</ul>
+
+<pre><code>&lt;Connector port="8443" protocol="HTTP/1.1" SSLEnabled="true"
+maxThreads="150" scheme="https" secure="true"
+clientAuth="false" sslProtocol="TLS" /&gt;</code></pre>
+
+<p>- Set protocol="org.apache.coyote.http11.Http11NioProtocol":</p>
+
+<pre><code>&lt;Connector port="8443" protocol="org.apache.coyote.http11.Http11NioProtocol" SSLEnabled="true"
+maxThreads="150" scheme="https" secure="true"
+clientAuth="false" sslProtocol="TLS" /&gt;</code></pre>
+
+<p>- Next, provide the password and file path of the Certificate you created:</p>
+
+<pre><code>&lt;Connector port="8443" protocol="org.apache.coyote.http11.Http11NioProtocol" SSLEnabled="true"
+maxThreads="150" scheme="https" secure="true"
+clientAuth="false" sslProtocol="TLS"
+keystoreFile="/home/owais/MyCertificate.cert"
+keystorePass="mysslcertificatepassword" /&gt;</code></pre>
+
+<ul>
+  <li>Save the file and exit the editor</li>
+  <li>Run: service tomcat6 restart</li>
+</ul>
+
+<h2>Test if it works</h2>
+
+<ul>
+  <li>Open your browser and try: https://localhost:8443</li>
+  <li>The browser should warn you that the website is untrusted source. Ignore and proceed, you may add the website as an exception.</li>
+</ul>
+
+<p>Next step is to configure your web application to talk only to HTTPS enabled tomcat server</p>
+
+<ul>
+  <li>Open your web app's web.xml in any editor</li>
+  <li>Add the following lines at the bottom of your web.xml, just before &lt;/web-app&gt; tag closure</li>
+</ul>
+
+<pre><code>&lt;!-- This block makes sure that all the resources are accessed via HTTPS --&gt;
+&lt;security-constraint&gt;
+&lt;web-resource-collection&gt;
+&lt;web-resource-name&gt;HTTPSOnly&lt;/web-resource-name&gt;
+&lt;url-pattern&gt;/*&lt;/url-pattern&gt;
+&lt;/web-resource-collection&gt;
+&lt;user-data-constraint&gt;
+&lt;transport-guarantee&gt;CONFIDENTIAL&lt;/transport-guarantee&gt;
+&lt;/user-data-constraint&gt;
+&lt;/security-constraint&gt;
+&lt;!-- This block overrides the previous for certain resources and enables them on both HTTP and HTTPS --&gt;
+&lt;security-constraint&gt;
+&lt;web-resource-collection&gt;
+&lt;web-resource-name&gt;HTTPSOrHTTP&lt;/web-resource-name&gt;
+&lt;url-pattern&gt;*.jpg&lt;/url-pattern&gt;
+&lt;url-pattern&gt;/img/*&lt;/url-pattern&gt;
+&lt;url-pattern&gt;/css/*&lt;/url-pattern&gt;
+&lt;url-pattern&gt;index.html&lt;/url-pattern&gt;
+&lt;/web-resource-collection&gt;
+&lt;user-data-constraint&gt;
+&lt;transport-guarantee&gt;NONE&lt;/transport-guarantee&gt;
+&lt;/user-data-constraint&gt;
+&lt;/security-constraint&gt;</code></pre>
+
+<p>Now your application and web server are both ready to talk on a secure channel.</p>

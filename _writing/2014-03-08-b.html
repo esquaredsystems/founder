@@ -1,0 +1,202 @@
+---
+title: "Executing MapReduce Applications on Hadoop (Single-node Cluster) - Part 2"
+date: 2014-03-08-b
+permalink: "/writing/2014/march/mapreduce-part-2/"
+category: "technology"
+description: "Part 2: building and running Word Count from source in Eclipse."
+---
+
+<p>Previously, we saw how to execute built-in example of Word Count on Hadoop, in this part, we will try to build the same application on Eclipse from the source code of word count and run it.</p>
+
+<p>First, you need to install Eclipse on your Hadoop-ready Virtual Machine (assuming that JDK is already installed when you set up Hadoop). This can be done by installing from Ubuntu software center, but my recommendation is that you download it and extract to your Home directory. Any version of Eclipse should work, I have done the experiments on version 4.3 (Kepler).</p>
+
+<p>After installation, launch Eclipse and the first thing to do is to make Oracle JDK your default Java Runtime:</p>
+
+<ul>
+  <li>Go to Window &gt; Preferences &gt; Java &gt; Installed JREs</li>
+  <li>If the default JRE does not point to Oracle JRE, then edit and set the directory to /usr/lib/jvm/java-7-oracle/</li>
+  <li>Press OK to finish</li>
+</ul>
+
+<figure class="post-figure">
+  <img src="{{ '/assets/img/writing/mapreduce-part-2/01.png' | relative_url }}"
+       alt="" width="694" height="560" loading="lazy" decoding="async">
+</figure>
+
+<figure class="post-figure">
+  <img src="{{ '/assets/img/writing/mapreduce-part-2/02.png' | relative_url }}"
+       alt="" width="614" height="595" loading="lazy" decoding="async">
+</figure>
+
+<p>Now we will create a Java Application Project:</p>
+
+<p>- Go to New &gt; Java Project</p>
+
+<figure class="post-figure">
+  <img src="{{ '/assets/img/writing/mapreduce-part-2/03.png' | relative_url }}"
+       alt="" width="615" height="639" loading="lazy" decoding="async">
+</figure>
+
+<p>- Name the project Combinatorics, since we will be doing some counting problems in this project</p>
+
+<figure class="post-figure">
+  <img src="{{ '/assets/img/writing/mapreduce-part-2/04.png' | relative_url }}"
+       alt="" width="615" height="639" loading="lazy" decoding="async">
+</figure>
+
+<ul>
+  <li>No need to change anything else. Press Finish</li>
+  <li>A Java project named Combinatorics should appear in your Package Explorer window on the Left</li>
+</ul>
+
+<p>We will need some external libraries in order to build Hadoop's code. Download these libraries:</p>
+
+<p>1. commons-configuration-1.6.jar</p>
+
+<p>2. commons-httpclient-3.0.1.jar</p>
+
+<p>3. commons-lang-2.4.jar</p>
+
+<p>4. commons-logging-1.1.1.jar</p>
+
+<p>5. commons-logging-api-1.0.4.jar</p>
+
+<p>6. hadoop-core-1.0.3.jar</p>
+
+<p>7. jackson-core-asl-1.8.8.jar</p>
+
+<p>8. jackson-mapper-asl-1.8.8.jar</p>
+
+<p>9. log4j-1.2.15.jar</p>
+
+<p>I have put these libraries in a zipped file here as well.</p>
+
+<figure class="post-figure">
+  <img src="{{ '/assets/img/writing/mapreduce-part-2/05.png' | relative_url }}"
+       alt="" width="802" height="579" loading="lazy" decoding="async">
+</figure>
+
+<p>After you have collected all the libraries:</p>
+
+<ul>
+  <li>Right click on the project &gt; New &gt; Folder</li>
+  <li>Name the folder lib and finish</li>
+</ul>
+
+<figure class="post-figure">
+  <img src="{{ '/assets/img/writing/mapreduce-part-2/06.png' | relative_url }}"
+       alt="" width="613" height="632" loading="lazy" decoding="async">
+</figure>
+
+<ul>
+  <li>Copy all jar files in the newly created folder (you can do so in Nautilus as well as in Eclipse)</li>
+  <li>Right click on lib folder and click Refresh</li>
+</ul>
+
+<figure class="post-figure">
+  <img src="{{ '/assets/img/writing/mapreduce-part-2/07.png' | relative_url }}"
+       alt="" width="1301" height="639" loading="lazy" decoding="async">
+</figure>
+
+<ul>
+  <li>The jars you have added should now appear here</li>
+  <li>Go to Project &gt; Properties &gt; Java Build Path &gt; Add Jars &gt; Combinatorics&gt; lib. Select all jar files</li>
+</ul>
+
+<figure class="post-figure">
+  <img src="{{ '/assets/img/writing/mapreduce-part-2/08.png' | relative_url }}"
+       alt="" width="883" height="560" loading="lazy" decoding="async">
+</figure>
+
+<figure class="post-figure">
+  <img src="{{ '/assets/img/writing/mapreduce-part-2/09.png' | relative_url }}"
+       alt="" width="464" height="528" loading="lazy" decoding="async">
+</figure>
+
+<p>- Go to Project and check Build Automatically</p>
+
+<p>Next, we need to create a Source file in src folder. Right click on src folder &gt; New &gt; Class. Name it WordCount and Finish.</p>
+
+<figure class="post-figure">
+  <img src="{{ '/assets/img/writing/mapreduce-part-2/10.png' | relative_url }}"
+       alt="" width="656" height="639" loading="lazy" decoding="async">
+</figure>
+
+<p>Add the following methods to the newly created class:</p>
+
+<pre><code>import java.io.IOException;
+import java.util.StringTokenizer;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.*;</code></pre>
+
+<pre><code>public class WordCount {
+public static class Map extends Mapper&lt;LongWritable, Text, Text, IntWritable&gt; {
+private final static IntWritable one = new IntWritable (1);
+private Text word = new Text ();</code></pre>
+
+<pre><code>public void map (LongWritable key, Text value, Context context) throws IOException, InterruptedException {
+String line = value.toString ();
+StringTokenizer tokenizer = new StringTokenizer (line);
+while (tokenizer.hasMoreTokens ()) {
+word.set (tokenizer.nextToken ());
+context.write (word, one);
+}
+}
+}</code></pre>
+
+<pre><code>public static class Reduce extends Reducer&lt;Text, IntWritable, Text, IntWritable&gt; {
+public void reduce (Text key, Iterable&lt;IntWritable&gt; values, Context context) throws IOException, InterruptedException {
+int sum = 0;
+for (IntWritable val : values) {
+sum += val.get ();
+}
+context.write (key, new IntWritable (sum));
+}
+}</code></pre>
+
+<pre><code>public static void main (String[] args) throws Exception {
+Configuration conf = new Configuration ();
+Job job = new Job (conf, "wordcount");
+job.setOutputKeyClass (Text.class);
+job.setOutputValueClass (IntWritable.class);
+job.setMapperClass (Map.class);
+job.setReducerClass (Reduce.class);
+job.setInputFormatClass (TextInputFormat.class);
+job.setOutputFormatClass (TextOutputFormat.class);
+FileInputFormat.addInputPath (job, new Path (args[0]));
+FileOutputFormat.setOutputPath (job, new Path (args[1]));
+job.waitForCompletion (true);
+}
+}</code></pre>
+
+<p>This is the simplest for of a MapReduce program. We will have an in-depth look at the code later; first, we need to run this.</p>
+
+<ul>
+  <li>Go to Run &gt; Run to execute the program</li>
+  <li>The program should, at first end on an ArrayIndexOutOfBounds Exception</li>
+  <li>Go to Run &gt; Run Configurations &gt; Arguments and add the following argument:</li>
+</ul>
+
+<p>/home/hadoop/Documents/books/ /home/hadoop/Documents/books/output (assuming that you followed part 1 and the text files are still in this path)</p>
+
+<figure class="post-figure">
+  <img src="{{ '/assets/img/writing/mapreduce-part-2/11.png' | relative_url }}"
+       alt="" width="800" height="639" loading="lazy" decoding="async">
+</figure>
+
+<p>- Before you press Run, are all the Hadoop services running? You have to start them. Remember! Here is the command:</p>
+
+<pre><code>$ start-all.sh</code></pre>
+
+<p>- Now press Run</p>
+
+<p>Watch the same progress log on the output window that you previously saw on Terminal. Your output should be in the /home/hadoop/Documents/books/output directory.</p>
+
+<figure class="post-figure">
+  <img src="{{ '/assets/img/writing/mapreduce-part-2/12.png' | relative_url }}"
+       alt="" width="1301" height="639" loading="lazy" decoding="async">
+</figure>

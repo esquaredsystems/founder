@@ -66,7 +66,7 @@ layout: default
 <section class="section">
   <div class="wrap">
     <div class="section__head">
-      <h2>Where I've been</h2>
+      <h2>Geographical footprint</h2>
     </div>
     {% include countries.html %}
   </div>
@@ -132,32 +132,6 @@ layout: default
     </ul>
   </div>
 </section>
-
-{%- include all-posts.html -%}
-{%- if all_posts.size > 0 -%}
-<section class="section">
-  <div class="wrap">
-    <div class="section__head">
-      <h2>Writing</h2>
-      <a href="{{ '/writing/' | relative_url }}">All posts {% include icon.html name="arrow" %}</a>
-    </div>
-    <div class="card-grid">
-      {%- for post in all_posts limit: 3 -%}
-      {%- assign pcat = site.data.categories | where: "slug", post.category | first -%}
-      {%- assign prtl = false -%}{%- if post.dir == 'rtl' %}{% assign prtl = true %}{% endif -%}
-      <a class="card" href="{{ post.url | relative_url }}">
-        <span class="card__meta">
-          <span>{{ pcat.name | default: "Writing" }}</span>
-          <span><time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%b %Y" }}</time></span>
-        </span>
-        <h3 class="card__title{% if prtl %} urdu{% endif %}"{% if prtl %} dir="rtl" lang="ur"{% endif %}>{{ post.title }}</h3>
-        <p class="card__body{% if prtl %} urdu rtl{% endif %}"{% if prtl %} dir="rtl" lang="ur"{% endif %}>{{ post.description | default: post.excerpt | strip_html | truncate: 140 }}</p>
-      </a>
-      {%- endfor -%}
-    </div>
-  </div>
-</section>
-{%- endif -%}
 
 <section class="section section--soft">
   <div class="wrap">

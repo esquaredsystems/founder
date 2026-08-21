@@ -1,0 +1,196 @@
+---
+title: "A step-by-step guide to query data on Hadoop using Hive"
+date: 2014-05-12-b
+permalink: "/writing/2014/may/hive-on-hadoop/"
+category: "technology"
+description: "Loading 2 million bookings into Hive and racing the query against MySQL."
+---
+
+<p>Hadoop empowers us to solve problems that require intense processing and storage on commodity hardware harnessing the power of distributed computing, while ensuring reliability. When it comes to applicability beyond experimental purposes, the industry welcomes Hadoop with warm heart, as it can query their databases in realistic time regardless of the volume of data. In this post, we will try to run some experiments to see how this can be done.</p>
+
+<p>Before you start, make sure you have set up a Hadoop cluster. We will use Hive, a data warehouse to query large data sets and a adequate-sized sample data set, along with an imaginary database of a travelling agency on MySQL; the DB consisting of details about their clients, including Flight bookings, details of bookings and hotel reservations. Their data model is as below:</p>
+
+<figure class="post-figure">
+  <img src="{{ '/assets/img/writing/hive-on-hadoop/01.png' | relative_url }}"
+       alt="" width="695" height="340" loading="lazy" decoding="async">
+</figure>
+
+<figure class="post-figure">
+  <img src="{{ '/assets/img/writing/hive-on-hadoop/02.png' | relative_url }}"
+       alt="" width="1156" height="469" loading="lazy" decoding="async">
+</figure>
+
+<p>The number of records in the database tables are as:</p>
+
+<ul>
+  <li>booking: 2.1M</li>
+  <li>booking_detail: 2.1M</li>
+  <li>booking_hotel: 1.48M</li>
+  <li>city: 2.2K</li>
+</ul>
+
+<p>We will write a query that retrieves total country-wise bookings with a hotel reservation, paid in USD or GBP, distributed by booking type for each country.</p>
+
+<pre><code>select c.city_title, d.booking_type, count(*) total from booking b</code></pre>
+
+<p>inner join booking_detail d on d.booking_id = b.booking_id</p>
+
+<p>inner join booking_hotel h on h.booking_id = b.booking_id</p>
+
+<p>inner join city c on c.city_code = d.city_code where b.currency in ('GBP','USD')</p>
+
+<p>group by c.city_code, d.booking_type</p>
+
+<p>This query takes 150 seconds on MySQL to execute. We will try to reduce the query execution time by importing the dataset on Hive and executing the same query on our Hadoop cluster. Here are the steps:</p>
+
+<p>Importing Data</p>
+
+<p>First step is to export the tables in the database CSV files. Open MySQL Workbench in your master (assuming you have MySQL Server and Workbench installed and have exported the data set in it) and execute the following queries:</p>
+
+<pre><code>select * from city into outfile '/tmp/city.csv' fields terminated by ',' lines terminated by '\n';</code></pre>
+
+<pre><code>select * from booking into outfile '/tmp/booking.csv' fields terminated by ',' lines terminated by '\n';</code></pre>
+
+<pre><code>select * from booking_detail into outfile '/tmp/booking_detail.csv' fields terminated by ',' lines terminated by '\n';</code></pre>
+
+<pre><code>select * from booking_hotel into outfile '/tmp/booking_hotel.csv' fields terminated by ',' lines terminated by '\n';</code></pre>
+
+<p>This will export the tables in /tmp directory as CSV files.</p>
+
+<p>Installing Hive</p>
+
+<figure class="post-figure">
+  <img src="{{ '/assets/img/writing/hive-on-hadoop/03.png' | relative_url }}"
+       alt="" width="724" height="463" loading="lazy" decoding="async">
+</figure>
+
+<p>We now install Hive on our Hadoop-ready machine. Download hive-0.11.0 from Apache Hive’s downloads</p>
+
+<p>Extract into /home/hadoop/Downloads directory</p>
+
+<p>Start Hadoop services and disable safemode:</p>
+
+<pre><code>$ start-all.sh
+$ hadoop dfsadmin -safemode leave
+$ jps</code></pre>
+
+<p>Copy Hive binaries and libraries into /usr/local director (or wherever you wish to install):</p>
+
+<pre><code>$ sudo cp -R /home/hadoop/Downloads/hive-0.11.0/ /usr/local/</code></pre>
+
+<p>Create a temporary directory in HDFS and a warehouse directory for Hive:</p>
+
+<pre><code>$ hadoop fs -mkdir /tmp
+$ hadoop fs -mkdir /hadoop/hive/warehouse</code></pre>
+
+<p>Assign rights:</p>
+
+<pre><code>$ hadoop fs -chmod g+w /tmp
+$ hadoop fs -chmod g+w /hadoop/hive/warehouse</code></pre>
+
+<p>Export environment variable for Hive:</p>
+
+<pre><code>$ export HIVE=/usr/local/hive-0.11.0</code></pre>
+
+<p>Run hive:</p>
+
+<pre><code>$ $HIVE/bin/hive</code></pre>
+
+<p>You should now be in Hive prompt.</p>
+
+<p>Preparing Hive Database</p>
+
+<p>We will now create tables in Hive DB. Note that there are certain Hive data types that are different from traditional DBMS data types. In addition, we have specified that the fields are terminated by coma, as well as the format, in which the data will be saved. This is because Hive has separate data structures to process different formats of data. Now create the tables identical to the schema by executing following queries:</p>
+
+<pre><code>hive&gt;create table booking (booking_id int, currency string, departure_date string, requested_date string) row format delimited fields terminated by ',' stored as textfile;</code></pre>
+
+<pre><code>hive&gt;create table booking_detail (booking_id int, deetails_id int, booking_type string, item_code string, item_name string, passenger_count int, city_code string, duration int, price float, breakfast string, description string) row format delimited fields terminated by ',' stored as textfile;</code></pre>
+
+<pre><code>hive&gt;create table booking_hotel (booking_id int, details_id int, room_type string, room_cat string) row format delimited fields terminated by ',' stored as textfile;</code></pre>
+
+<pre><code>hive&gt;create table city (city_code string, city_title string, country string) row format delimited fields terminated by ',' stored as textfile;</code></pre>
+
+<figure class="post-figure">
+  <img src="{{ '/assets/img/writing/hive-on-hadoop/04.png' | relative_url }}"
+       alt="" width="724" height="553" loading="lazy" decoding="async">
+</figure>
+
+<p>Next step is to load the data from the CSV files into Hive tables. Execute the following commands to do so:</p>
+
+<pre><code>hive&gt;load data local inpath '/tmp/city.csv' overwrite into table city;</code></pre>
+
+<pre><code>hive&gt;load data local inpath '/tmp/booking.csv' overwrite into table booking;</code></pre>
+
+<pre><code>hive&gt;load data local inpath '/tmp/booking_detail.csv' overwrite into table booking_detail;</code></pre>
+
+<pre><code>hive&gt;load data local inpath '/tmp/booking_hotel.csv' overwrite into table booking_hotel;</code></pre>
+
+<figure class="post-figure">
+  <img src="{{ '/assets/img/writing/hive-on-hadoop/05.png' | relative_url }}"
+       alt="" width="1301" height="639" loading="lazy" decoding="async">
+</figure>
+
+<p>Make sure that all tables are in place.</p>
+
+<pre><code>hive&gt;show tables;</code></pre>
+
+<p>Now execute a query to count the number of records in booking table:</p>
+
+<pre><code>hive&gt;select count(*) from booking;</code></pre>
+
+<p>This will execute a MapReduce job against the given query; the query took 24.5 seconds, which may seem to be surprising to you. This is because the first time, Hive initiates a lot of things, creates some files in temp directory, etc. We will execute the same query again; this time, it took 14.3 seconds. Still, this is very high time for a simple count query. This needs some explanation.</p>
+
+<p>First of all, MySQL and other RDBMSs are optimized to run queries faster using techniques like Indexing, etc. On the other hand, Hive is to run queries on Hadoop framework, which is a distributed computing environment. Therefore, the time it takes to distribute the data, interpret the query, create MapReduce tasks respectively is where the time is consumed most.</p>
+
+<p>Second, a simple count query is not the type of query we should run on distributed environment, as it can easily be handled by RDBMS itself. The real performance impact will be shown when we run a complex query that processes data in large volume.</p>
+
+<p>Now run the same query, which MySQL executed in 150 seconds:</p>
+
+<pre><code>hive&gt;select c.city_title, d.booking_type, count(*) total from booking b inner join booking_detail d on d.booking_id = b.booking_id inner join booking_hotel h on h.booking_id = b.booking_id inner join city c on c.city_code = d.city_code where b.currency in ('GBP','USD') group by c.city_code, d.booking_type;</code></pre>
+
+<p>The query takes 132.84 seconds on single node on Hive. This is because the MapReduce job breaks the original query into pieces, thus leveraging all cores of the CPU to process data in parallel.</p>
+
+<p>We can try the same by increasing number of mappers and reducers. To do so, first quit Hive:</p>
+
+<pre><code>hive&gt;quit;</code></pre>
+
+<p>Shut down Hadoop's services</p>
+
+<pre><code>$ stop-all.sh</code></pre>
+
+<p>Edit the mapred-site.xml file in</p>
+
+<pre><code>$ sudo nano /usr/local/hadoop/conf/mapred-site.xml</code></pre>
+
+<p>Add two properties to the file:</p>
+
+<pre><code>&lt;property&gt;
+&lt;name&gt;mapred.map.tasks&lt;/name&gt;
+&lt;value&gt;20&lt;/value&gt;
+&lt;/property&gt;
+&lt;property&gt;
+&lt;name&gt;mapred.reduce.tasks&lt;/name&gt;
+&lt;value&gt;5&lt;/value&gt;
+&lt;/property&gt;</code></pre>
+
+<figure class="post-figure">
+  <img src="{{ '/assets/img/writing/hive-on-hadoop/06.png' | relative_url }}"
+       alt="" width="724" height="463" loading="lazy" decoding="async">
+</figure>
+
+<figure class="post-figure">
+  <img src="{{ '/assets/img/writing/hive-on-hadoop/07.png' | relative_url }}"
+       alt="" width="1366" height="663" loading="lazy" decoding="async">
+</figure>
+
+<p>Save the file and exit; start all Hadoop services and Hive again; run the same query.</p>
+
+<p>This time, the query was processed in 121.3 seconds. This is because as the number of mappers increase, the data will be divided into more blocks, thus requiring less processing per block. But be cautious here, increasing mappers too much can overkill, resulting in more disk head reads and writes, while CPU sitting idle. It requires some experimentation to determine the correct number of mappers and reducers required for a job.</p>
+
+<p>The experiment showed how Hive can outperform MySQL on the same machine on slow-queries. Repeating the same experiment on multi-node will definitely reduce the time.</p>
+
+<p>So.. what are you waiting for? Go for it...</p>
+
+<p>PS: You may find the screenshots of this post here.</p>
+
+<p>PPS: I would like to thank Nabeel Imam (imam.nabeel@gmail.com) for his helping hand in setting up and carrying out the experiments...</p>
