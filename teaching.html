@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Teaching
-description: Undergraduate courses taught at the Karachi Institute of Economics and Technology, and short trainings run for engineering teams and student groups — software engineering, algorithms, web, mobile and decentralised application development.
+description: Undergraduate courses taught at the Karachi Institute of Economics and Technology, and short trainings run for engineering teams and student groups, like software engineering, algorithms, web, mobile and decentralised application development.
 permalink: /teaching/
 ---
 {% include site-vars.html %}
@@ -22,10 +22,7 @@ permalink: /teaching/
 
   <div class="prose" style="max-width:none">
     {%- comment -%}
-      Course materials live in `courses/<slug>/`, where <slug> is the course
-      name run through `slugify`. Nothing links the two but that convention, so
-      renaming a course in teaching.csv means renaming its folder to match —
-      otherwise the course simply shows no materials, silently.
+      Course materials live in `courses/<slug>/`, where <slug> is the course name run through `slugify`. Nothing links the two but that convention, so renaming a course in teaching.csv means renaming its folder to match.
     {%- endcomment -%}
     {%- for term in terms -%}
     <section style="margin-bottom:3rem">
@@ -42,7 +39,7 @@ permalink: /teaching/
     {%- endfor -%}
 
     {%- comment -%}
-      Trainings are listed in _data/trainings.csv — the file's own
+      Trainings are listed in _data/trainings.csv. The file's own
       order is the display order. Each row's `slug` names its folder under
       `trainings/`; a row without a folder simply shows no slides.
     {%- endcomment -%}

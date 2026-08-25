@@ -1,12 +1,12 @@
 # founder
 
-Personal site of Owais A. Hussain — built with [Jekyll](https://jekyllrb.com/)
+Personal site of Owais A. Hussain, built with [Jekyll](https://jekyllrb.com/)
 and served by GitHub Pages.
 
 **Live:** https://esquaredsystems.github.io/founder/
 
 Adding content is one commit. There is no build step to run, no plugins to
-install, and no CI to configure — push to `master` and GitHub rebuilds the site.
+install, and no CI to configure. Push to `master` and GitHub rebuilds the site.
 See **[CONTENT-GUIDE.md](CONTENT-GUIDE.md)** for exactly what file to create for
 each kind of update.
 
@@ -32,7 +32,7 @@ _layouts/                default, page, post, project
 _includes/               head, header, footer, icon, countries, post-list,
                          category-nav, all-posts, world-map.svg
 assets/
-  css/style.css          the whole stylesheet — design tokens at the top
+  css/style.css          the whole stylesheet (design tokens at the top)
   js/site.js             dark-mode toggle and the map hover
   img/flags/             country flags (flag-icons, MIT)
   files/certificates/    certificate PDFs and images
@@ -42,9 +42,9 @@ certifications.html  writing.html  404.html
 feed.xml  sitemap.xml    hand-written, so no plugins are needed
 ```
 
-Two content patterns, used deliberately:
+Two content patterns, and why each one:
 
-- **CSV** for everything structured — roles, papers, projects, certifications,
+- **CSV** for everything structured: roles, papers, projects, certifications,
   countries, skills, the timeline. Jekyll reads CSV out of `_data/` natively, so
   there is no converter, no build step of our own, and nothing to install. Edit
   in Excel, Sheets or a text editor; commit; done.
@@ -70,7 +70,7 @@ text), loaded from Google Fonts with system fallbacks.
 
 ## Running it locally (optional)
 
-You do not need this to publish — but if you want a preview before pushing:
+You do not need this to publish, but if you want a preview before pushing:
 
 **Windows (one-time setup)**
 
@@ -93,12 +93,12 @@ refreshes. Stop it with `Ctrl+C`.
 
 `--unpublished` builds posts marked `published: false` so you can read a piece
 while you are still working on it. They are clearly badged, and the flag is
-local only — GitHub Pages never sees it. Drop the flag to preview the site
+local only. GitHub Pages never sees it. Drop the flag to preview the site
 exactly as the world will get it.
 
 > Because there is a `Gemfile` in this folder, Jekyll insists on being launched
-> through Bundler. Always use `bundle exec jekyll serve`, not `jekyll serve` —
-> a bare `jekyll` command will fail with `Could not find gem ...`.
+> through Bundler. Always use `bundle exec jekyll serve`, not `jekyll serve`.
+> A bare `jekyll` command will fail with `Could not find gem ...`.
 
 On macOS or Linux the same three commands work once Ruby is installed
 (`brew install ruby` / `apt install ruby-full build-essential`).
@@ -106,7 +106,7 @@ On macOS or Linux the same three commands work once Ruby is installed
 ### A note on Ruby 3.4+
 
 Ruby 3.4 dropped `base64` and `bigdecimal` from its default gems. Jekyll 3.10
-still needs both — `safe_yaml` uses one and Liquid the other — so the Gemfile
+still needs both (`safe_yaml` uses one and Liquid the other), so the Gemfile
 requires them explicitly. Without those two lines `bundle exec jekyll serve`
 fails on Ruby 3.4 with a `cannot load such file -- base64` error. If you ever
 regenerate this Gemfile from a tutorial written before 2025, add them back.
@@ -124,10 +124,10 @@ baseurl: "/founder"
 
 If you later:
 
-- **attach a custom domain** (e.g. `owaishussain.com`) — add a `CNAME` file
+- **attach a custom domain** (e.g. `owaishussain.com`): add a `CNAME` file
   containing the bare domain, then set `url` to `https://owaishussain.com` and
   `baseurl` to `""`.
-- **move the repo to a personal account named `owaishussain`** — it becomes a
+- **move the repo to a personal account named `owaishussain`**: it becomes a
   user page at `https://owaishussain.github.io/`; set `url` to that and
   `baseurl` to `""`.
 

@@ -1,6 +1,5 @@
 {%- comment -%}
-  Read-only archive of comments carried over from Blogspot. Nothing is stored
-  or fetched at runtime — the comments live in the post's own front matter, so
+  Read-only archive of comments carried over from Blogspot. Nothing is stored or fetched at runtime. The comments live in the post's own front matter, so
   they are just as durable as the post itself.
 
   Front matter shape:
@@ -17,7 +16,7 @@
     {{ page.comments | size }} comment{% if page.comments.size != 1 %}s{% endif %}
   </h2>
   <p class="comments__note">
-    Carried over from Blogspot when this post moved here. New comments are closed —
+    Carried over from Blogspot when this post moved here. New comments are closed, so
     {% include site-vars.html %}<a href="mailto:{{ site_email }}">email me</a> instead.
   </p>
   <ol class="comments__list">

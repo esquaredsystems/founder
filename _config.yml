@@ -15,7 +15,7 @@
 title: Owais A. Hussain
 tagline: I make fairy tales out of data
 description: >-
-  Personal site of Owais A. Hussain — PhD in data mining, 17+ years building
+  Personal site of Owais A. Hussain. PhD in data mining, 17+ years building
   software for healthcare, education and emerging tech. Research in influence
   mining, machine learning and health informatics.
 
@@ -28,7 +28,7 @@ baseurl: "/founder"
 markdown: kramdown
 highlighter: rouge
 # Fallback only. Each piece sets its own `permalink:` so the month can be
-# spelled out — Jekyll has no month-name placeholder.
+# spelled out, because Jekyll has no month-name placeholder.
 permalink: /writing/:year/:month/:title/
 timezone: Asia/Karachi
 
@@ -40,13 +40,13 @@ kramdown:
 sass:
   style: compressed
 
-# No plugins are required — the site is deliberately plugin-free so it builds
+# No plugins are required. The site is plugin-free so it builds
 # identically on GitHub Pages, on any Jekyll version, and offline.
 plugins: []
 
 # NOTE: `courses/` and `trainings/` carry no leading underscore, deliberately.
 # Jekyll skips underscore-prefixed folders unless they are named in `include:`,
-# and `include:` lives here in _config.yml — which `jekyll serve` reads once at
+# and `include:` lives here in _config.yml, which `jekyll serve` reads once at
 # startup and never re-reads. Adding a folder then meant restarting the server
 # before its files appeared, with nothing to say why they hadn't. Plain folder
 # names are copied through with no configuration at all.

@@ -11,8 +11,7 @@ permalink: /research/
   <div class="page-head">
     <span class="eyebrow">Publications</span>
     <h1>Research</h1>
-    <p class="lede">Influence mining and complex networks, applied machine learning, and health
-    informatics — with a recent turn towards Web3 security.</p>
+    <p class="lede">Influence mining and complex networks, applied machine learning, and health informatics, with a recent turn towards Web3 security.</p>
   </div>
 
   <div class="chips" style="margin-bottom:2.5rem">
@@ -29,7 +28,7 @@ permalink: /research/
       <div class="item__head">
         <div>
           <h2 class="item__title">{% if pub.url %}<a href="{{ pub.url }}" rel="noopener">{{ pub.title }}</a>{% else %}{{ pub.title }}{% endif %}</h2>
-          <p class="item__sub"><em>{{ pub.venue }}</em>{% if pub.authors %} — with {{ pub.authors }}{% endif %}</p>
+          <p class="item__sub"><em>{{ pub.venue }}</em>{% if pub.authors %}, with {{ pub.authors }}{% endif %}</p>
         </div>
         <span class="item__year">{% if pub.year %}{{ pub.year }}{% else %}{{ pub.status }}{% endif %}</span>
       </div>
