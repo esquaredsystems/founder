@@ -44,12 +44,12 @@ sass:
 # identically on GitHub Pages, on any Jekyll version, and offline.
 plugins: []
 
-# Teaching material lives in underscore-prefixed folders, which Jekyll skips by
-# default. These two are copied through to the built site as-is, so the decks
-# keep their real filenames and can be linked straight from the Teaching page.
-include:
-  - _courses
-  - _trainings
+# NOTE: `courses/` and `trainings/` carry no leading underscore, deliberately.
+# Jekyll skips underscore-prefixed folders unless they are named in `include:`,
+# and `include:` lives here in _config.yml — which `jekyll serve` reads once at
+# startup and never re-reads. Adding a folder then meant restarting the server
+# before its files appeared, with nothing to say why they hadn't. Plain folder
+# names are copied through with no configuration at all.
 
 # ---------------------------------------------------------------------------
 # Collections

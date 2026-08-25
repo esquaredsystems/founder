@@ -4,13 +4,30 @@ title: Page not found
 permalink: /404.html
 sitemap: false
 ---
+
 <div class="wrap">
   <div class="page-head prose">
     <span class="eyebrow">404</span>
+
     <h1>That page isn't here</h1>
-    <p class="lede">The link may be old, or the page may have moved.</p>
+
+    <p class="lede">
+      The link may be old, or the page may have moved.
+    </p>
+
+    <div class="feature-importance">
+      <p><strong>Why did this happen?</strong></p>
+
+      <pre>
+Dead link URL            ████████████████  87%
+Typo in address          ██████            11%
+Parallel universe        █                  2%</pre>
+    </div>
+
     <p style="margin-top:2rem">
-      <a class="btn btn--primary" href="{{ '/' | relative_url }}">Back home {% include icon.html name="arrow" %}</a>
+      <a class="btn btn--primary" href="{{ '/' | relative_url }}">
+        Back home {% include icon.html name="arrow" %}
+      </a>
       <a class="btn" href="{{ '/projects/' | relative_url }}">Projects</a>
       <a class="btn" href="{{ '/writing/' | relative_url }}">Writing</a>
     </p>

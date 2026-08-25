@@ -848,18 +848,6 @@ details.course .course__body {
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
   gap: 0.1rem 1.6rem;
 }
-/* A day heading inside a multi-day workshop. It spans the whole grid so the
-   files under it start on a fresh row rather than wrapping beside it. */
-.course__files-group {
-  grid-column: 1 / -1;
-  margin: 0.9rem 0 0.2rem;
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--text-faint);
-}
-.course__files-group:first-child { margin-top: 0; }
 .course__files li a {
   display: flex;
   align-items: baseline;

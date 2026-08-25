@@ -1,11 +1,11 @@
 #,year,what,where,major
-1,2006,Software Developer,Integral Solutions,no
-2,2010,Software Engineer,Interactive Research & Development,yes
-3,2013,Team Lead,IHS · MS Computer Science,no
-4,2018,Software Architect,IHS,no
-5,2020,Chief Information Officer,IHS,yes
-6,2022,Co-founder,Esquared Systems,no
-7,2023,"PhD, Data Mining",KIET,yes
-8,2023,"Assistant Professor",KIET,yes
-9,2024,Chief Technology Officer,TechThree.io,yes
-10,2025,Associate Professor,KIET,no
+,2006,"Software Developer","Integral Solutions","no"
+,2010,"Software Engineer","Interactive Research & Development","yes"
+,2013,"Team Lead","IHS · MS Computer Science","no"
+,2018,"Software Architect","IHS","no"
+,2020,"Chief Information Officer","IHS","yes"
+,2022,"Co-founder","Esquared Systems","no"
+,2023,"PhD, Data Mining","KIET","yes"
+,2023,"Assistant Professor","KIET","yes"
+,2024,"Chief Technology Officer","TechThree.io","yes"
+,2025,"Associate Professor","KIET","no"

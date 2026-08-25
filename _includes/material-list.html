@@ -2,32 +2,25 @@
   Lists the slide decks and handouts that live under one folder of teaching
   material.
 
-    {% include material-list.html prefix="/_courses/software-engineering/" %}
-    {% include material-list.html prefix="/_trainings/microservices/" label="Slides" %}
+    {% include material-list.html prefix="/courses/software-engineering/" %}
+    {% include material-list.html prefix="/trainings/microservices/" label="Slides" %}
 
   `prefix` is matched with leading *and* trailing slashes, so a course whose
   slug happens to be a prefix of another course's slug cannot pick up the wrong
-  files. Static files are read in directory order, which Jekyll does not
-  promise to sort, so sort explicitly — the "Lecture 01 / Lecture 02" ordering
-  is the whole point of the list.
+  files.
 
-  A folder may have one level of subfolders (the Java workshop is split by
-  day). Those become headings inside the list.
+  Every folder is flat — files sit directly inside it, no subfolders. Static
+  files are read in directory order, which Jekyll does not promise to sort, so
+  sort explicitly: the "Lecture 01 / Lecture 02" ordering is the whole point of
+  the list, and it is the only thing deciding the order, so filenames have to
+  sort the way they should read.
 {%- endcomment -%}
 {%- assign material_prefix = include.prefix -%}
 {%- assign materials = site.static_files | where_exp: "f", "f.path contains material_prefix" | sort: "path" -%}
 {%- if materials.size > 0 %}
 <p class="course__materials-label">{% include icon.html name="download" %} {{ include.label | default: "Course materials" }} <span class="course__count">{{ materials.size }}</span></p>
 <ul class="course__files">
-  {%- assign current_group = "" -%}
-  {%- for file in materials -%}
-  {%- assign rest = file.path | remove_first: material_prefix -%}
-  {%- assign parts = rest | split: "/" -%}
-  {%- if parts.size > 1 -%}{%- assign folder = parts.first -%}{%- else -%}{%- assign folder = "" -%}{%- endif -%}
-  {%- if folder != current_group -%}
-  {%- assign current_group = folder %}
-  <li class="course__files-group">{{ folder }}</li>
-  {%- endif %}
+  {%- for file in materials %}
   <li><a href="{{ file.path | relative_url }}" download>{{ file.basename }}<span class="course__ext">{{ file.extname | remove: "." }}</span></a></li>
   {%- endfor %}
 </ul>

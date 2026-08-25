@@ -22,7 +22,7 @@ permalink: /teaching/
 
   <div class="prose" style="max-width:none">
     {%- comment -%}
-      Course materials live in `_courses/<slug>/`, where <slug> is the course
+      Course materials live in `courses/<slug>/`, where <slug> is the course
       name run through `slugify`. Nothing links the two but that convention, so
       renaming a course in teaching.csv means renaming its folder to match —
       otherwise the course simply shows no materials, silently.
@@ -31,7 +31,7 @@ permalink: /teaching/
     <section style="margin-bottom:3rem">
       <h2 style="margin-bottom:0.5rem">{{ term.name }}</h2>
       {%- for course in term.items -%}
-      {%- assign course_prefix = course.course | slugify | prepend: "/_courses/" | append: "/" -%}
+      {%- assign course_prefix = course.course | slugify | prepend: "/courses/" | append: "/" -%}
       <details class="course" open>
         <summary>{{ course.course }}</summary>
         <div class="course__body">{{ course.topics }}</div>
@@ -42,15 +42,15 @@ permalink: /teaching/
     {%- endfor -%}
 
     {%- comment -%}
-      Trainings are listed in _data/trainings.csv, newest first — the file's own
+      Trainings are listed in _data/trainings.csv — the file's own
       order is the display order. Each row's `slug` names its folder under
-      `_trainings/`; a row without a folder simply shows no slides.
+      `trainings/`; a row without a folder simply shows no slides.
     {%- endcomment -%}
     <section style="margin-bottom:3rem">
       <h2 style="margin-bottom:0.5rem">Trainings</h2>
       <p class="muted" style="max-width:64ch;margin-bottom:1.4rem">{{ trainings_intro }}</p>
       {%- for training in site.data.trainings -%}
-      {%- assign training_prefix = training.slug | prepend: "/_trainings/" | append: "/" -%}
+      {%- assign training_prefix = training.slug | prepend: "/trainings/" | append: "/" -%}
       <details class="course">
         <summary>{{ training.title }}</summary>
         {%- if training.date or training.venue %}

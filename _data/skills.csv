@@ -1,36 +1,36 @@
 #,group,item
-1,core,Research and academic writing
-2,core,Software engineering
-3,core,Data science
-4,core,Blockchain
-5,core,Effective communication
-6,core,Team building
-7,core,Teaching
-8,Expertise,"Database application architecture, design and development"
-9,Expertise,"Data integration, migration and reporting"
-10,Expertise,Data mining and analytics
-11,Expertise,Machine learning
-12,Expertise,Web and mobile application design and development
-13,Expertise,Blockchain and decentralised application design and development
-14,Expertise,Algorithm development and code optimisation
-15,Expertise,Deployment and configuration on Linux and Windows Server
-16,Expertise,IT infrastructure management
-17,Expertise,Formal documentation
-18,Programming,"Java: Spring, Hibernate"
-19,Programming,"Python: Django, FastAPI"
-20,Programming,"Mobile: React Native, Android"
-21,Programming,"Web: JavaScript, React, jQuery, GWT"
-22,Programming,"Reporting & analysis: R, Power BI, Talend, Pentaho, MS Excel"
-23,Programming,C#
-24,Programming,Linux shell
-25,Databases,MySQL / MariaDB
-26,Databases,PostgreSQL
-27,Databases,MongoDB
-28,Databases,SQLite
-29,Cloud,Amazon Web Services
-30,Cloud,DigitalOcean
-31,Cloud,Jarvis Labs
-32,Engineering tools,Git
-33,Engineering tools,Maven
-34,Engineering tools,JIRA
-35,Engineering tools,Confluence
+,"core","Research and academic writing"
+,"core","Software engineering"
+,"core","Data science"
+,"core","Blockchain"
+,"core","Effective communication"
+,"core","Team building"
+,"core","Teaching"
+,"Expertise","Database application architecture, design and development"
+,"Expertise","Data integration, migration and reporting"
+,"Expertise","Data mining and analytics"
+,"Expertise","Machine learning"
+,"Expertise","Web and mobile application design and development"
+,"Expertise","Blockchain and decentralised application design and development"
+,"Expertise","Algorithm development and code optimisation"
+,"Expertise","Deployment and configuration on Linux and Windows Server"
+,"Expertise","IT infrastructure management"
+,"Expertise","Formal documentation"
+,"Programming","Java: Spring, Hibernate"
+,"Programming","Python: Django, FastAPI"
+,"Programming","Mobile: React Native, Android"
+,"Programming","Web: JavaScript, React, jQuery, GWT"
+,"Programming","Reporting & analysis: R, Power BI, Talend, Pentaho, MS Excel"
+,"Programming","C#"
+,"Programming","Linux shell"
+,"Databases","MySQL / MariaDB"
+,"Databases","PostgreSQL"
+,"Databases","MongoDB"
+,"Databases","SQLite"
+,"Cloud","Amazon Web Services"
+,"Cloud","DigitalOcean"
+,"Cloud","Jarvis Labs"
+,"Engineering tools","Git"
+,"Engineering tools","Maven"
+,"Engineering tools","JIRA"
+,"Engineering tools","Confluence"

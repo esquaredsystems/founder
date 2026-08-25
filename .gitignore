@@ -5,7 +5,3 @@ _site/
 Gemfile.lock
 vendor/
 .DS_Store
-
-# Scratch folder used when a file has to be moved aside rather than deleted.
-# Safe to remove entirely.
-_to_delete/

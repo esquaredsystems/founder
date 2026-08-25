@@ -1,11 +1,11 @@
 #,kind,name,url,icon,primary,extra,extra2
-1,membership,IEEE,https://www.ieee.org/,,,Institute of Electrical and Electronics Engineers,Member
-2,link,LinkedIn,https://www.linkedin.com/in/owaishussain/,linkedin,yes,,
-3,link,YouTube,https://www.youtube.com/@owaisahussain,youtube,yes,,
-4,link,Google Scholar,https://scholar.google.com/citations?user=vy_wkhcAAAAJ,scholar,yes,,
-5,link,ResearchGate,https://www.researchgate.net/profile/Owais-Hussain-3,research,yes,,
-6,link,Scopus,https://www.scopus.com/authid/detail.uri?authorId=56022524200,research,no,,
-7,link,GitHub,https://github.com/esquaredsystems,github,yes,,
-8,link,Email,mailto:owaishussain@ieee.org,mail,yes,,
-9,blog,Vision 360,https://owaisahussain.blogspot.com/,,,"Yet another blog about technology and development — software engineering, data science, mobile tech and the occasional rant.",en
-10,blog,بزمِ انجم,https://bazmeanjum.blogspot.com/,,,Urdu poetry and literature.,ur
+,"membership","IEEE","https://www.ieee.org/",,,"Institute of Electrical and Electronics Engineers","Member"
+,"link","LinkedIn","https://www.linkedin.com/in/owaishussain/","linkedin","yes",,
+,"link","YouTube","https://www.youtube.com/@owaisahussain","youtube","yes",,
+,"link","Google Scholar","https://scholar.google.com/citations?user=vy_wkhcAAAAJ","scholar","yes",,
+,"link","ResearchGate","https://www.researchgate.net/profile/Owais-Hussain-3","research","yes",,
+,"link","Scopus","https://www.scopus.com/authid/detail.uri?authorId=56022524200","research","no",,
+,"link","GitHub","https://github.com/esquaredsystems","github","yes",,
+,"link","Email","mailto:owaishussain@ieee.org","mail","yes",,
+,"blog","Vision 360","https://owaisahussain.blogspot.com/",,,"Yet another blog about technology and development — software engineering, data science, mobile tech and the occasional rant.","en"
+,"blog","بزمِ انجم","https://bazmeanjum.blogspot.com/",,,"Urdu poetry and literature.","ur"
