@@ -23,7 +23,8 @@
 {%- assign site_portrait2x = _p | where: "key", "portrait_2x" | first | map: "value" | first -%}
 
 {%- assign countries_label     = _p | where: "key", "countries_label"      | first | map: "value" | first -%}
-{%- assign teaching_intro          = _p | where: "key", "teaching_intro"          | first | map: "value" | first -%}
+{%- assign teaching_intro      = _p | where: "key", "teaching_intro"  | first | map: "value" | first -%}
+{%- assign trainings_intro     = _p | where: "key", "trainings_intro" | first | map: "value" | first -%}
 
 {%- comment -%} Slices of links.csv, by kind. {%- endcomment -%}
 {%- assign site_links       = site.data.links | where: "kind", "link" -%}

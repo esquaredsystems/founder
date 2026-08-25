@@ -60,6 +60,23 @@ infrastructure · health informatics · decentralised applications.
 {%- endfor %}
 </div>
 
+## Volunteer work
+
+<ul class="items">
+  <li class="item">
+    <h3 class="item__title">Teaching volunteer — GirlsWhoML</h3>
+    <p class="item__body">Taught machine learning to two sessions and revised the course content to fit the audience of the South Asian region.</p>
+  </li>
+  <li class="item">
+    <h3 class="item__title">Level 2 contributor — OpenMRS community</h3>
+    <p class="item__body">Contributed to the OpenMRS community and mentored Google Summer of Code students twice.</p>
+  </li>
+  <li class="item">
+    <h3 class="item__title">Computer Science teacher — Esquared Academy</h3>
+    <p class="item__body">Volunteer teacher of Computer Science for O-level students.</p>
+  </li>
+</ul>
+
 ## Before that
 
 {%- assign past = site.data.companies | where: "status", "past" %}

@@ -44,9 +44,12 @@ sass:
 # identically on GitHub Pages, on any Jekyll version, and offline.
 plugins: []
 
-# Publish teaching materials stored in the underscore-prefixed course folder.
+# Teaching material lives in underscore-prefixed folders, which Jekyll skips by
+# default. These two are copied through to the built site as-is, so the decks
+# keep their real filenames and can be linked straight from the Teaching page.
 include:
   - _courses
+  - _trainings
 
 # ---------------------------------------------------------------------------
 # Collections

@@ -26,7 +26,9 @@ GitHub web editor. Read the encoding note at the bottom before using Excel.
 | `papers.csv` | The Research page and the research block on the home page |
 | `projects.csv` | The Projects page and the project cards |
 | `teaching.csv` | Course outlines on the Teaching page |
+| `trainings.csv` | The Trainings section of the Teaching page |
 | `_courses/` | Lecture files linked under their matching Teaching course |
+| `_trainings/` | Slide decks linked under their matching training |
 | `grades.csv` | The grade distribution chart at the bottom of Teaching |
 | `certifications.csv` | The Certifications page |
 | `timeline.csv` | The career strip across the home page |
@@ -74,6 +76,51 @@ repo. Regenerate it only if you want a different projection or resolution:
 npm pack world-atlas && tar xzf world-atlas-*.tgz
 python3 tools/build_world_map.py package/countries-110m.json
 ```
+
+---
+
+## Slide decks: `_courses/` and `_trainings/`
+
+Both folders work the same way. A folder of files is attached to a row of a CSV
+by **name**, and nothing but the name connects them:
+
+| | The row | The folder must be called |
+|---|---|---|
+| Courses | a row of `teaching.csv` | `_courses/<the course name, slugified>/` |
+| Trainings | a row of `trainings.csv` | `_trainings/<whatever is in the `slug` column>/` |
+
+"Slugified" means lowercased with every run of non-letters turned into a single
+hyphen — `Digital Logic and Design` becomes `digital-logic-and-design`. Get it
+wrong by one character and the course still renders, with its outline, and
+simply shows no files. There is no error. **If a course's materials vanish,
+check the folder name against the course name first.**
+
+Trainings are freer, because the `slug` column says outright which folder to
+use; rename the training and the folder can stay put.
+
+Inside a folder, files are listed in **alphabetical order**, so name them so
+that alphabetical order is the order you want: `Lecture 01`, `Lecture 02` …
+A folder may contain one level of subfolders — the Java workshop uses `Day 1`
+… `Day 5` — and those become headings in the list.
+
+Any file type works; the extension is shown as a small badge beside the name.
+
+**A training row:**
+
+```csv
+#,title,date,venue,slug,summary
+3,Microservices,July 2026,Careem — Karachi,microservices,"One sentence to a short paragraph on what the session covered."
+```
+
+`date` and `venue` are free text and both are optional — leave either blank and
+that half of the line simply disappears. Rows display **in file order**, so keep
+the file newest-first.
+
+> **Why the underscore folders need a line in `_config.yml`.** Jekyll ignores
+> any top-level folder whose name starts with `_`. The `include:` list at the
+> top of `_config.yml` names `_courses` and `_trainings` as exceptions, which is
+> what copies them into the built site with their real filenames intact. A third
+> such folder would need adding to that list too.
 
 ---
 

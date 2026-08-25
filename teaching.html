@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Teaching
-description: Undergraduate courses taught at the Karachi Institute of Economics and Technology — software engineering, algorithms, web, mobile and decentralised application development.
+description: Undergraduate courses taught at the Karachi Institute of Economics and Technology, and short trainings run for engineering teams and student groups — software engineering, algorithms, web, mobile and decentralised application development.
 permalink: /teaching/
 ---
 {% include site-vars.html %}
@@ -21,32 +21,50 @@ permalink: /teaching/
   </div>
 
   <div class="prose" style="max-width:none">
+    {%- comment -%}
+      Course materials live in `_courses/<slug>/`, where <slug> is the course
+      name run through `slugify`. Nothing links the two but that convention, so
+      renaming a course in teaching.csv means renaming its folder to match —
+      otherwise the course simply shows no materials, silently.
+    {%- endcomment -%}
     {%- for term in terms -%}
     <section style="margin-bottom:3rem">
       <h2 style="margin-bottom:0.5rem">{{ term.name }}</h2>
       {%- for course in term.items -%}
-      {%- assign course_slug = course.course | slugify -%}
-      {%- case course_slug -%}
-        {%- when 'design-and-analysis-of-algorithms' -%}{%- assign course_slug = 'design-andanalysis-of-algorithms' -%}
-        {%- when 'mobile-application-development' -%}{%- assign course_slug = 'mobile-application-ddevelopment' -%}
-      {%- endcase -%}
-      {%- assign course_files = site.static_files | where_exp: "file", "file.path contains course_slug" -%}
+      {%- assign course_prefix = course.course | slugify | prepend: "/_courses/" | append: "/" -%}
       <details class="course" open>
         <summary>{{ course.course }}</summary>
         <div class="course__body">{{ course.topics }}</div>
-        {%- if course_files.size > 0 %}
-        <p class="course__materials-label">{% include icon.html name="download" %} Course materials ({{ course_files.size }})</p>
-        <ul class="course__files">
-          {%- for file in course_files %}
-          {%- assign course_file_url = file.path | replace: site.source, '' -%}
-          <li><a href="{{ course_file_url | relative_url }}">{{ file.name }}</a></li>
-          {%- endfor %}
-        </ul>
-        {%- endif %}
+        {% include material-list.html prefix=course_prefix label="Course materials" %}
       </details>
       {%- endfor -%}
     </section>
     {%- endfor -%}
+
+    {%- comment -%}
+      Trainings are listed in _data/trainings.csv, newest first — the file's own
+      order is the display order. Each row's `slug` names its folder under
+      `_trainings/`; a row without a folder simply shows no slides.
+    {%- endcomment -%}
+    <section style="margin-bottom:3rem">
+      <h2 style="margin-bottom:0.5rem">Trainings</h2>
+      <p class="muted" style="max-width:64ch;margin-bottom:1.4rem">{{ trainings_intro }}</p>
+      {%- for training in site.data.trainings -%}
+      {%- assign training_prefix = training.slug | prepend: "/_trainings/" | append: "/" -%}
+      <details class="course">
+        <summary>{{ training.title }}</summary>
+        {%- if training.date or training.venue %}
+        <p class="course__meta">
+          {%- if training.date %}{{ training.date }}{% endif -%}
+          {%- if training.date and training.venue %} · {% endif -%}
+          {%- if training.venue %}{{ training.venue }}{% endif -%}
+        </p>
+        {%- endif %}
+        <div class="course__body">{{ training.summary }}</div>
+        {% include material-list.html prefix=training_prefix label="Slides" %}
+      </details>
+      {%- endfor -%}
+    </section>
 
     <section>
       <h2>Aggregate grades</h2>

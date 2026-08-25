@@ -280,7 +280,7 @@ th {
   color: var(--text);
   flex: none;
 }
-.brand svg { width: 21px; height: 21px; }
+.brand svg { width: 36px; height: 36px; }
 .brand:hover { color: var(--accent); background: var(--bg-soft); text-decoration: none; }
 
 .site-nav {
@@ -803,6 +803,91 @@ details.course .course__body {
   color: var(--text-muted);
   font-size: 0.95rem;
   max-width: var(--prose);
+}
+/* Date and venue, directly under the title of a training. */
+.course__meta {
+  margin: 0.35rem 0 0;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  color: var(--text-faint);
+}
+
+/* ------------------------------------------------- course material lists -- */
+/* Slide decks and handouts, listed under the course or training they belong
+   to. The list is deliberately quiet: it sits below the outline and should not
+   compete with it. */
+.course__materials-label {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 1.4rem 0 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-faint);
+}
+.course__materials-label svg {
+  width: 0.95rem;
+  height: 0.95rem;
+  flex: none;
+}
+.course__count {
+  font-size: 0.72rem;
+  padding: 0.05rem 0.4rem;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.course__files {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
+  gap: 0.1rem 1.6rem;
+}
+/* A day heading inside a multi-day workshop. It spans the whole grid so the
+   files under it start on a fresh row rather than wrapping beside it. */
+.course__files-group {
+  grid-column: 1 / -1;
+  margin: 0.9rem 0 0.2rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-faint);
+}
+.course__files-group:first-child { margin-top: 0; }
+.course__files li a {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 0.32rem 0;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: var(--text-muted);
+  text-decoration: none;
+  border-bottom: 0;
+  overflow-wrap: anywhere;
+}
+.course__files li a:hover { color: var(--accent); }
+.course__ext {
+  flex: none;
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-faint);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.02rem 0.3rem;
+}
+.course__files li a:hover .course__ext {
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 /* ----------------------------------------------------------------- hero -- */
