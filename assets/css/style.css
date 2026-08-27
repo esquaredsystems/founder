@@ -623,6 +623,112 @@ html[data-theme="dark"] .draft-note {
 .item ul { margin: 0.6rem 0 0; padding-left: 1.1rem; color: var(--text-muted); font-size: 0.95rem; }
 .item li { margin-bottom: 0.3rem; }
 
+/* Project list header: title | org | year | tags, all on one wrapping line.
+   Scoped as .proj-head rather than reusing .item__head/.item__sub, which stay
+   a two-column grid for certifications/research/writing/index — this is a
+   projects-page-only layout. */
+.proj-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+}
+.proj-head .item__title { margin: 0; }
+.proj-org { color: var(--text-muted); font-size: 0.95rem; }
+.proj-org::before,
+.proj-head > .item__year::before,
+.proj-head > .tags::before {
+  content: "|";
+  display: inline-block;
+  margin: 0 0.6em;
+  color: var(--text-faint);
+  font-weight: 400;
+}
+.proj-head .tags { align-items: center; }
+
+/* The three projects with their own page (TB REACH, Bubsy, Aao TB Mitao)
+   get a title that reads as a link on sight, not just on hover — unlike
+   every other .item__title a on the site, which looks like plain text
+   until hovered. Scoped to .proj-head so that convention stays untouched
+   elsewhere. */
+.proj-head .item__title a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-color: var(--accent-soft);
+  text-underline-offset: 0.15em;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+.proj-head .item__title a:hover {
+  color: var(--accent-hover);
+  text-decoration-color: currentColor;
+}
+
+/* Flag(s) or a globe, before the project title. */
+.proj-flags {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-right: 0.5rem;
+  vertical-align: middle;
+}
+.proj-flag {
+  display: block;
+  width: 18px;
+  height: 13px;
+  object-fit: cover;
+  border-radius: 2px;
+  border: 1px solid var(--border-strong);
+}
+.proj-flag--globe {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  color: var(--text-faint);
+}
+.proj-flag--globe svg { width: 100%; height: 100%; }
+
+/* Collapsible project entries: <details> nested inside <li class="item">,
+   so the existing .item border/padding and :first-child rule still apply. */
+.item__details { position: relative; }
+.item__details summary {
+  cursor: pointer;
+  list-style: none;
+  padding-right: 2.5rem;
+}
+.item__details summary::-webkit-details-marker { display: none; }
+.item__details:hover .item__title,
+.item__details summary:hover .item__title { color: var(--accent); }
+/* The toggle: a filled accent circle, not a faint character, so it reads as
+   a control worth clicking rather than decoration. */
+.item__details summary::after {
+  content: "+";
+  position: absolute;
+  top: -0.2rem;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.8rem;
+  height: 1.8rem;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 1.2rem;
+  font-weight: 600;
+  line-height: 1;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+.item__details summary:hover::after {
+  background: var(--accent);
+  color: var(--bg);
+  transform: scale(1.1);
+}
+.item__details[open] summary::after { content: "\2212"; }
+.item__details .item__body { margin-top: 0.8rem; }
+
 /* --------------------------------------------------------------- roles -- */
 .role { border-top: 1px solid var(--border); padding: 1.6rem 0; }
 .role:first-child { border-top: 0; }

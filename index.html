@@ -100,14 +100,25 @@ layout: default
       <h2>Selected projects</h2>
       <a href="{{ '/projects/' | relative_url }}">All {{ site.data.projects | size }} projects {% include icon.html name="arrow" %}</a>
     </div>
+    {%- assign written_up = site.projects | map: "slug" -%}
     <div class="card-grid">
-      {%- for project in featured limit: 6 -%}
+      {%- for project in featured limit: 9 -%}
+      {%- assign has_page = written_up | where_exp: "s", "s == project.slug" | size -%}
+      {%- if has_page > 0 -%}
       <a class="card" href="{{ '/projects/' | append: project.slug | append: '/' | relative_url }}">
         {% include domain-icon.html project=project %}
         <span class="card__meta"><span>{{ project.org }}</span>{% if project.year %}<span>{{ project.year }}</span>{% endif %}</span>
-        <h3 class="card__title">{{ project.title }}</h3>
+        <h3 class="card__title">{% include project-flags.html project=project %}{{ project.title }}</h3>
         <p class="card__body">{{ project.summary }}</p>
       </a>
+      {%- else -%}
+      <a class="card" href="{{ '/projects/' | relative_url }}#{{ project.slug }}">
+        {% include domain-icon.html project=project %}
+        <span class="card__meta"><span>{{ project.org }}</span>{% if project.year %}<span>{{ project.year }}</span>{% endif %}</span>
+        <h3 class="card__title">{% include project-flags.html project=project %}{{ project.title }}</h3>
+        <p class="card__body">{{ project.summary }}</p>
+      </a>
+      {%- endif -%}
       {%- endfor -%}
     </div>
   </div>

@@ -116,3 +116,19 @@
   svg.addEventListener('mouseleave', clear);
 })();
 
+
+/* Projects page: linking to /projects/#<slug> should open that entry's
+   collapsible details (if it has any) and scroll it into view. */
+(function () {
+  function openTarget() {
+    var hash = window.location.hash;
+    if (!hash || hash.length < 2) return;
+    var el = document.getElementById(hash.slice(1));
+    if (!el) return;
+    var details = el.querySelector('details');
+    if (details) details.open = true;
+    el.scrollIntoView();
+  }
+  window.addEventListener('hashchange', openTarget);
+  openTarget();
+})();

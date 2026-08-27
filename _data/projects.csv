@@ -1,22 +1,134 @@
-#,slug,title,org,year,order,featured,tags,summary,url_external
-,"nextgpu","NextGPU","TechThree","2026",2026,"yes","Web3; infrastructure; GPU","Peer-to-peer private GPU sharing platform.",
-,"bubsy","Bubsy","TechThree","2024",2024,"yes","AI; NLP; Web3; security","A state-of-the-art AI-driven bot that detects spam and FUD attacks in Web3 communities on Telegram.",
-,"etica-etb","ETICA-eTB","Abt Associates","2023",2023,"yes","health informatics; ETL; MDR-TB","National MDR-TB system for Tajikistan, integrated with the QuaLIS laboratory system.",
-,"itis-dw","ITIS-DW","KMITS, Department of Health, Philippines","2022",2022,"yes","data warehouse; health informatics; ETL","Data warehouse for the Knowledge Management wing of the Department of Health, Philippines, managing the national TB/HIV programme.",
-,"hydra","Hydra","IHS","2021",2021.1,"yes","health informatics; screening","A highly customisable mass patient screening platform.",
-,"bahmni-sync","Bahmni Sync","Burnette","2021",2021,"yes","open source; EMR; distributed systems","A module of the flagship open-source EMR product Bahmni that synchronises multiple instances in a distributed deployment.",
-,"aagahi","Aagahi","Aahung","2019",2019,"no","NLP; chatbot; Roman Urdu","An SMS and WhatsApp chatbot built on TensorFlow, using NLP to answer frequently asked questions in Roman Urdu.",
-,"bablibot","Bablibot","MCH, IRD Global","2018",2018,"no","NLP; chatbot; immunisation","An SMS and WhatsApp chatbot built on TensorFlow that used NLP to answer frequent questions asked in Roman Urdu by parents vaccinating their children.",
-,"aao-tb-mitao","Aao TB Mitao","TIH","2016–19",2016,"yes","public health; tuberculosis; screening","The largest private intervention to counter tuberculosis in the community using mass screening strategies.",
-,"mine-tb","MINE-TB","IRD South Africa",,2015,"no","public health; tuberculosis","Deployed in South Africa to find TB cases among mine workers.",
-,"xpertsms","XpertSMS","IHS","2014",2014.1,"no","health informatics; messaging","A messaging system for GeneXpert® diagnostic machines that broadcasts test results over SMS and the web.",
-,"tb-reach-4-pakistan","TB REACH 4 (Pakistan)","IRD","2014",2014,"no","public health; tuberculosis","Reducing the burden of tuberculosis in rural Sindh, with a focus on children.",
-,"sehatmand-zindagi","Sehatmand Zindagi","CHS","2013",2013,"no","public health; screening","Improving detection and treatment of lung and related diseases through mass screening, with a sustainable social business model for public health.",
-,"tb-reach-kenya","TB REACH Kenya","IRD","2012",2012.1,"no","public health; tuberculosis; mobile","A mobile and web-based implementation of TB REACH in Kenya.",
-,"irz","IRZ (Interactive Reminders for Zimbabwe)","IRD","2012",2012,"no","public health; mobile","A tablet-based web project in Zimbabwe improving post-treatment follow-up rates through scheduled SMS alerts.",
-,"openxdata-documentation","openXdata Documentation","IRD","2011",2011.1,"no","open source; documentation; UML","Documenting the modules of openXdata, a free and open-source project for data collection on low-cost mobile devices, using UML.",
-,"tb-reach-ii","TB REACH II","IRD","2011",2011,"no","public health; tuberculosis","Increasing early case detection, reporting and correct treatment of TB in low-cost private laboratories serving poor communities in Karachi and Dhaka.",
-,"mission-zindagi","Mission Zindagi","IRD","2010",2010,"no","public health; tuberculosis","TB REACH, also known as Mission Zindagi: increasing case detection and case holding of TB patients through conditional cash transfers to general practitioners and community mobilisers.",
-,"school-fees-manager","School Fees Manager","Integral Solutions","2008",2008,"no","education","Built for The Educators school franchise. The project was axed after a month of development.",
-,"gsm-controller","GSM Controller","Integral Solutions","2007",2007,"no","messaging; marketing","A marketing tool combining an SMS system, email system, contacts manager and scheduler.",
-,"gu-mis","GU-MIS","Greenwich University","2006",2006,"no","education; .NET","Management information system for Greenwich University, Karachi: registration, examinations, student information desk and reporting.",
+#,slug,title,org,year,order,featured,tags,country,summary,detail,url_external
+,"nextgpu","NextGPU","TechThree","2026",2026,"yes","Web3; infrastructure; GPU","tr","Peer-to-peer private GPU sharing platform.","NextGPU is a platform that lets people rent out spare GPU computing power to each other. A provider with a machine to spare can offer it up, and a consumer needing GPU power can rent it, paid for with the platform's own token. It includes a hardware-benchmarking agent, wallet-based login, and an AI service built on OpenAI's API.
+
+**Stack:** Java Spring Boot (multi-module Gradle), PostgreSQL, OpenAI API, Web3, WSL, Docker, Bouncy Castle.",
+,"bubsy","Bubsy","TechThree","2024–25",2024,"yes","AI; NLP; Web3; security","tr","An AI-driven moderation bot for Web3 and crypto communities on Telegram, detecting spam and bad-faith messages and verifying new members.",,
+,"etica-etb","ETICA-eTB","Abt Associates","2023",2023,"yes","health informatics; ETL; MDR-TB","tj","National MDR-TB system for Tajikistan, integrated with the QuaLIS laboratory system.","A national register for multidrug-resistant tuberculosis in Tajikistan,
+including two-way integration with the QuaLIS laboratory information system so
+that lab results flow into the clinical record without manual re-entry.",
+,"itis-dw","ITIS-DW","KMITS, Department of Health, Philippines","2022",2022,"yes","data warehouse; health informatics; ETL","ph","Data warehouse for the Knowledge Management wing of the Department of Health, Philippines, managing the national TB/HIV programme.","A national data warehouse consolidating TB and HIV programme data for the
+Knowledge Management wing of the Philippine Department of Health, with ETL
+pipelines from multiple provincial source systems and a reporting layer for
+programme managers.
+
+**Stack:** Talend, SQL, JasperReports.",
+,"hydra","Hydra","The Indus Hospital, IHS","2019–21",2021.1,"no","health informatics; screening","pk","A 360 degree, configurable platform for managing tuberculosis, from screening through diagnosis and treatment.","Hydra is a complete, configure-only product for public health projects, using OpenMRS as its backend. Modules behind it manage assets, events, fields, forms and locations, giving programmes a zero-code, end-to-end patient record covering screening, diagnosis and treatment. An Android app, branded ""Indus Project"" in one build, is the field-facing side.
+
+**Stack:** Native Android, Java, OpenMRS.",
+,"bahmni-sync","Bahmni Sync","Burnet Institute","2021",2021,"no","open source; EMR; distributed systems","au","A module of the flagship open-source EMR product Bahmni that synchronises multiple instances in a distributed deployment.","Bahmni is a widely deployed open-source hospital and clinic management system. Bahmni Sync is a pair of OpenMRS modules, a master module and a worker module, that keep multiple Bahmni installations in sync in a distributed, sometimes offline deployment. It captures database changes on each node with Debezium and Kafka, then reconciles them between a master server and worker servers.
+
+**Stack:** Java, OpenMRS module framework, Maven, Debezium, Kafka, ZooKeeper, MySQL.",
+,"aagahi","Aagahi","Aahung","2019",2019,"no","health informatics; monitoring and evaluation","pk","A data collection and monitoring system for Aahung, supporting life skills education and reproductive health work.","Aagahi is a data management system built for Aahung, a Pakistani NGO that focuses on Life Skills Based Education, supporting teachers and schools in providing age-appropriate health and personal development education. Aahung also works to improve how healthcare professionals handle sensitive sexual and reproductive health issues. The system lets the organisation collect and manage structured data through custom forms, track locations, people and donors, and generate reports.
+
+**Stack:** Java, Spring, MySQL, React, native Android.",
+,"bablibot","Bablibot","MCH, IRD Global","2018",2018,"no","NLP; chatbot; immunisation","pk","An SMS and WhatsApp chatbot built on TensorFlow that used NLP to answer frequent questions asked in Roman Urdu by parents vaccinating their children.","Bablibot was a chatbot built for Zindagi Mehfooz, an early maternal and child healthcare immunisation programme running in multiple provinces in Pakistan. Caregivers bringing children for routine immunisation have a predictable set of questions (schedules, side effects, what to do after a missed dose) and often no easy way to ask them. Bablibot answered those questions over SMS and WhatsApp in Roman Urdu, using natural language processing.
+
+A feasibility study of this work was published in the *International Journal of Medical Informatics*: see [Research](/founder/research/).
+
+**Stack:** Python, Django, MongoDB, TensorFlow, tflearn, Keras, NLTK, scikit-learn, Docker.",
+,"aao-tb-mitao","Aao TB Mitao","The Indus Hospital, IHS","2016–20",2016,"yes","public health; tuberculosis; screening","pk","The largest private intervention to counter tuberculosis in the community using mass screening strategies.",,
+,"mine-tb","MINE-TB","IRD South Africa",,2015,"no","public health; tuberculosis","za","Deployed in South Africa to find TB cases among mine workers.","MINE-TB was TB REACH's fourth wave in Port Shepstone, South Africa. It worked to reduce the tuberculosis burden among mine workers, an unusually high-risk population, by involving community mobilisers directly in active case finding.
+
+**Stack:** Java, GWT, MySQL, native Android, OpenMRS.",
+,"xpertsms","XpertSMS","IHS","2014",2014.1,"no","health informatics; messaging","pk","A messaging system for GeneXpert® diagnostic machines that broadcasts test results over SMS and the web.","XpertSMS connects to the GeneXpert Dx diagnostic machine and sends results wherever they're needed: by SMS, to OpenMRS, to GxAlert, or as CSV files. It has a desktop client that talks to the machine directly, and a separate web dashboard built on Google Web Toolkit.
+
+**Stack:** Core Java, Swing desktop client, GWT, MySQL.",
+,"tb-reach-4-pakistan","TB REACH 4 (Pakistan)","IRD","2014",2014,"no","public health; tuberculosis","pk","Reducing the burden of tuberculosis in rural Sindh, with a focus on children.","The fourth wave of TB REACH in Pakistan. It targeted tuberculosis and drug-resistant tuberculosis in rural Sindh through contact tracing of adult cases and reverse contact tracing of paediatric cases.
+
+**Stack:** Java, GWT, MySQL, native Android, OpenMRS.",
+,"sehatmand-zindagi","Sehatmand Zindagi","IRD","2014–19",2014.8,"no","public health; tuberculosis","pk;bd;tj;tz","Part of TB REACH, paying conditional cash transfers to General Practitioners and community mobilisers to increase TB case detection and case holding.","Sehatmand Zindagi is [TB REACH](/founder/projects/tb-reach/)'s third wave. It paid conditional cash transfers to General Practitioners and community mobilisers to increase case detection and case holding, with case detection, case holding, reporting and event-alert modules. It ran separately in Pakistan, Bangladesh, Tajikistan and Tanzania. The Pakistan deployment was the largest, adding its own barcode generator for patient IDs, a data warehouse, a GWT-based field-monitoring web app, a sync tool for a third-party lab system and a dynamic reporting web app.
+
+**Stack:** Java, GWT, MySQL, native Android, OpenMRS.",
+,"tb-reach-kenya","TB REACH Kenya","IRD","2012",2012.1,"no","public health; tuberculosis; mobile","ke","A mobile and web-based implementation of TB REACH in Kenya.","A port of the TB REACH model to Kenya, delivered as a mobile and web
+application.
+
+**Stack:** Java, GWT, MySQL, native Android, OpenMRS.",
+,"irz","IRZ (Interactive Reminders for Zimbabwe)","IRD Global","2014",2012,"no","public health; mobile","zw","A tablet-based web project in Zimbabwe improving post-treatment follow-up rates through scheduled SMS alerts.","Interactive Reminders for Zimbabwe is a web-based system for tablet computers, built to improve follow-up for tuberculosis and male circumcision patients by sending scheduled SMS reminders after treatment.
+
+**Stack:** Java, GWT, Tomcat, MySQL, SMS gateway.",
+,"openxdata-documentation","openXdata Architecture","IRD","2011",2011.1,"no","open source; documentation; UML","global","Documenting the modules of openXdata, a free and open-source project for data collection on low-cost mobile devices, using UML.","openXdata is a free and open-source platform for collecting data on low-cost mobile devices, including in areas with limited or unreliable connectivity. It lets organisations design electronic forms, collect and validate data in the field, and synchronise it with a central server once a connection is available. The contribution here was architecture and design documentation for the project's modules.
+
+**Stack:** Microsoft Visio.",
+,"tb-reach-ii","TB REACH II","IRD","2011",2011,"no","public health; tuberculosis","pk;bd","Increasing early case detection, reporting and correct treatment of TB in low-cost private laboratories serving poor communities in Karachi and Dhaka.","TB REACH II extended the programme into low-cost private laboratories in
+Karachi, Pakistan and Dhaka, Bangladesh: the places where poor patients
+actually seek testing first. Core functions mirror TB REACH.
+
+**Stack:** Java, GWT, MySQL, native Android, OpenMRS.",
+,"mission-zindagi","Mission Zindagi","IRD","2010",2010,"no","public health; tuberculosis","pk","TB REACH, also known as Mission Zindagi: increasing case detection and case holding of TB patients through conditional cash transfers to general practitioners and community mobilisers.","TB REACH's first wave, and the original implementation in Pakistan. Community health workers and General Practitioners were equipped with GPRS-enabled phones to find and treat TB patients in the community. Health workers screened people in clinics and hospitals, collected sputum samples and GPS coordinates for suspected cases, and were paid mobile-based incentives, through services such as UBL Omni, for case detection, sputum collection and successful treatment.
+
+**Stack:** Java, GWT, MySQL, native Android, OpenMRS.",
+,"school-fees-manager","School Fees Manager","Integral Solutions","2008",2008,"no","education","pk","Built for The Educators school franchise. The project was axed after a month of development.","A fee management system for a school franchise. Cancelled a month into
+development.",
+,"gsm-controller","GSM Controller","Integral Solutions","2007",2007,"no","messaging; marketing","pk","A marketing tool combining an SMS system, email system, contacts manager and scheduler.","An early bulk-communication tool: SMS, email, contact management and
+scheduling in one desktop product.",
+,"gu-mis","GU-MIS","Greenwich University","2006",2006,"yes","education; .NET","pk","Management information system for Greenwich University, Karachi: registration, examinations, student information desk and reporting.","Built on the .NET framework, GU-MIS is a management information system for Greenwich University in Karachi. It covers registration, academic records, examinations and timetables, a fee structure module, career counselling and a front-desk inquiry system, plus a student-facing web portal for checking exam results and profiles.
+
+**Stack:** VB.NET, C#, ASP.NET, SQL Server.",
+,"tb-reach","TB REACH","IRD","2010–2021",2010.5,"yes","public health; tuberculosis","pk;bd;tj;tz;za","IRD's flagship tuberculosis programme, run in several waves from 2010 onward to find and hold onto TB patients.",,
+,"global-fund-tb-south-africa","Global Fund TB, South Africa (GF-NDOH)","National Department of Health, South Africa","2014–15",2014.3,"yes","public health; tuberculosis","za","Helped South Africa's National Department of Health report TB screening and HIV offer data to the Global Fund.","Also known as GF-NDOH, this system helped South Africa's National Department of Health report TB screening and HIV offer data to the Global Fund, covering case detection of TB patients and the HIV offers made to them.
+
+**Stack:** Java, GWT, Tomcat, MySQL.",
+,"genexpert-support","GeneXpert Machine Support System","Biomedical wing, IHS","2020",2020,"no","health informatics; biomedical engineering","pk","An internal tool for tracking GeneXpert diagnostic machines and their maintenance.","A small internal tool for IHS's biomedical engineering team, tracking GeneXpert diagnostic machines. It records which machines are deployed where, logs calibration events, and lets staff log and track hardware issues against each machine.
+
+**Stack:** Python, Django, MySQL.",
+,"kiran-sitara-ehsaas","Kiran Sitara Ehsaas","Kiran Sitara Initiative","2019–20",2019.5,"no","health informatics; community health","pk","A data system for an initiative that trains adolescent schoolgirls as community health advocates.","A data system built at IHS for the Kiran Sitara Ehsaas initiative, which empowers adolescent schoolgirls from underserved communities by developing them as advocates within their communities, raising awareness of health-related concerns. A Java/Spring Boot backend manages participants, users, locations and roles for the programme, serving a mobile app (internally named Diya) and a React web front end for staff who need a browser-based view.
+
+**Stack:** Java, Spring Boot, MySQL, Liquibase, Maven, native Android, React.",
+,"nhsms","NHSMS (Neighborhood Health SMS Platform)","Neighborhood Health, Virginia","2018",2018.5,"no","health informatics; messaging","us","A messaging platform for a health clinic in the United States, sending SMS through Twilio.","A messaging platform built for a health clinic in the United States. It sends and receives SMS through the Twilio API, keeps a conversation log per patient, and can trigger automated replies based on decision rules. It also handles appointment reminders and bulk messaging, with a web dashboard for staff.
+
+**Stack:** Java, Spring Boot, PostgreSQL, Twilio, Maven.",
+,"is3","IS3 (Interactive SMS Survey Service)","IHS","2014",2014.2,"no","health informatics; messaging","pk","A survey tool that runs surveys over SMS.","IS3, short for Interactive SMS Survey Service, is a survey tool built at IHS. It lets you design surveys and run them over SMS through the SMSTarseel gateway, with a web interface for building surveys and pulling reports from responses.
+
+**Stack:** Java, GWT, MySQL, SMSTarseel gateway.",
+,"zm-rct","ZM-RCT","IRD, Zindagi Mehfooz programme","2014–20",2014.4,"no","public health; research; immunisation","pk","The web platform behind a randomised controlled trial run under the Zindagi Mehfooz immunisation programme.","ZM-RCT is a randomised controlled trial run under the Zindagi Mehfooz programme. An Android app enrols and follows up women taking part in the study; this is the web platform it talks to.
+
+**Stack:** Java, GWT, MySQL, native Android.",
+,"jennerx","JennerX","IRD","2014–17",2014.5,"no","public health; immunisation","pk","A child immunisation enrolment and follow-up system, named after Edward Jenner.","JennerX, named after Edward Jenner, is a child immunisation enrolment and follow-up system, built on the same platform as the Zindagi Mehfooz field system. An Android app registers children and tracks follow-up visits; this is the web platform it talks to.
+
+**Stack:** Java, GWT, MySQL, native Android.",
+,"covid19","Coronavirus App","Interactive Health Solutions","2020",2020.2,"no","health informatics; COVID-19","pk","An emergency Java/Spring Boot and React app for pandemic-era screening and access control, built for Interactive Health Solutions.","A Java and Spring Boot API paired with a React front end, built for Interactive Health Solutions during the COVID-19 pandemic. It manages people, locations and activity records with role-based access control. The screening workflow itself isn't hardcoded: the underlying data model is a check-in and access-control system, built around badges and activities, rather than a fixed clinical record.
+
+**Stack:** Java, Spring Boot, Lombok, Maven, React.",
+,"tb-contact-tracing-uganda","TB Contact Tracing, Uganda","IHS","2017–19",2017,"no","public health; tuberculosis; mobile","ug","An Android app for detecting TB cases in Uganda through contact tracing.","An Android app aimed at detecting TB cases in Uganda through a contact-tracing strategy.
+
+**Stack:** Native Android (Gradle).",
+,"qrcode-generator","QR Code Generator","IHS","2015–20",2015.5,"no","tools","pk","A general purpose QR code generator, as a desktop app and a web app.","A general-purpose QR code generator, usable either as a desktop Swing app or a web app, for producing QR codes in bulk.
+
+**Stack:** Java Swing desktop app, Java web app.",
+,"childhood-tb-bangladesh","Childhood TB, Bangladesh","IRD Bangladesh","2017",2017.1,"no","public health; tuberculosis","bd","An OpenMRS module and Android app for finding and treating tuberculosis in children in Bangladesh.","TB REACH's sixth wave: a Java web module built on OpenMRS, plus a companion Android app, for finding and treating tuberculosis in children in Bangladesh. It includes clinical forms for sputum tests, GeneXpert testing, chest X-rays and treatment follow-up, and a dashboard for tracking cases through diagnosis and treatment. Internally the project was named childhoodtb-bangladesh, not tbreach6.
+
+**Stack:** Java, OpenMRS, native Android.",
+,"zindagi-mehfooz-predictive-analytics","Zindagi Mehfooz Predictive Analytics","IHS, IRD's Maternal and Child Healthcare wing","2016",2016.5,"no","public health; data science","pk","A predictive analytics module for Zindagi Mehfooz, built in R.","A predictive analytics module for Zindagi Mehfooz. It builds models predicting things such as vaccine timeliness and dropout from immunisation system data, with a small Shiny app so the models can be used through a browser.
+
+**Stack:** R, machine learning packages, Shiny.",
+,"kmits-data-warehouse-reports","KMITS Data Warehouse Reports","KMITS, National Department of Health, Philippines","2021",2021.2,"no","data warehouse; health informatics; ETL","ph","ETL and reporting for the national TB programme's data warehouse in the Philippines.","A large-scale ETL and data warehouse project for the Philippines' national TB programme, using Talend for jobs and JasperReports templates for analytical reports. It covers presumptive TB cases, diagnosed drug-sensitive and drug-resistant cases, GeneXpert testing, paediatric cases and contact tracing, broken down by region, province and facility for a quarterly national report.
+
+**Stack:** Talend, SQL, JasperReports.",
+,"tb-predictive-analysis","Tuberculosis Predictive Analytics","Independent research","2014–16",2014.6,"no","public health; tuberculosis; data science","pk","Research using TB REACH I and II data to predict TB treatment outcomes.","A research project using real treatment data from TB REACH I and TB REACH II to predict treatment outcomes for TB patients. Patient, screening and treatment records from both programmes were combined and cleaned, then used to build predictive models in R.
+
+**Stack:** R, MySQL, CSV datasets.",
+,"dss","DSS (Decision Support System for Vaccination)","Ministry of Health","2019",2019.6,"no","health informatics; immunisation","pk","A decision support tool for child immunisation, built for Pakistan's Expanded Programme for Immunization.","A decision-support tool for child immunisation, built for Pakistan's Expanded Programme for Immunization (EPI). The Android app implements a vaccination workflow that lets field workers enrol children, record follow-up visits and sync saved forms, capturing EPI card numbers, vaccination dates and the next scheduled dose.
+
+**Stack:** Java, native Android.",
+,"influence-mining","influence.mining","PhD research","2020",2020.3,"no","research; complex networks","global","An R package for finding the most influential nodes in a network.","influence.mining is an R package written as part of PhD research into influence mining in complex networks. It provides functions for finding the most influential nodes in a graph using several methods, and for measuring influence through resilience or diffusion models.
+
+**Stack:** R, igraph.",
+,"opg-lesion-detection","Dental OPG Lesion Detection","Aga Khan University","2022",2022.1,"no","machine learning; healthcare","pk","A research project training deep learning models to detect dental lesions on panoramic X-rays.","A collaborative machine learning research project with Aga Khan University, detecting and classifying dental lesions on OPGs, the panoramic dental X-rays dentists use. Several deep learning models (including Faster R-CNN, Mask R-CNN and U-Net) were trained and compared to automatically find and mark abnormal areas in the X-ray images.
+
+**Stack:** Python, Keras, TensorFlow, OpenCV, scikit-learn (Faster R-CNN, Mask R-CNN, U-Net models).",
+,"epiandroid","Zindagi Mehfooz Field App","Zindagi Mehfooz programme, IRD Global","2014–17",2014.45,"no","public health; immunisation; mobile","pk","An Android field app for immunisation data collection, part of the Zindagi Mehfooz maternal and child healthcare programme.","Vaccinators used this Android app to enrol children, record EPI numbers and vaccine doses, and set up SMS reminders for the next visit. It worked offline and synced data in the background once a connection was available.
+
+**Stack:** Native Android (Java), sync service, SMS reminders.",
+,"green-crescent-trust","School Management System, Green Crescent Trust","Green Crescent Trust","2008–09",2008.5,"no","education; desktop","pk","A school management system built for Green Crescent Trust, a trust running schools around Karachi and in the interior of Sindh.","It handles admissions, academic records, timetables and attendance, with a small tool to keep data synchronised across locations and a module for SMS setup.
+
+**Stack:** C# WinForms (.NET), SQL Server, synchronisation utility, SMS setup module.",
+,"shore-dashboard","KPI Analytical Dashboard","Shore Capital","2022",2022.2,"yes","finance; data analytics; business intelligence","us","An R and Power BI analytics dashboard tracking mortgage loan application volume and processing cycle times for a US lender.","A reporting dashboard built for Shore Capital, a US mortgage lender, to track loan applications through their processing pipeline. R scripts pull application records from the company's database and compute cycle time metrics, how long an application takes from receipt to funding and from receipt to processing.
+
+The results feed a set of Plotly charts and a companion Power BI workbook covering the distribution of forward and reverse applications by status, the number of applications received per month, average cycle times from receipt to funded and from receipt to processed, and the number of applications processed by processing group.
+
+**Stack:** R, RMySQL, Plotly, Power BI.",
+,"mismorizer","MISMOrizer","Shore Capital","2022",2022.3,"no","fintech; document processing; OCR; NLP","us","A Django microservice that parses Uniform Residential Loan Application PDFs and converts them into MISMO XML for mortgage industry systems.","A microservice built for Shore Capital that processes Uniform Residential Loan Application (URLA) documents for Ellietrac software. It bundles a PDF parser with a converter that turns a submitted application into MISMO XML, the format used by Fannie Mae, Freddie Mac and several large mortgage brokers in the USA.
+
+Incoming PDFs are parsed page by page, with OCR and NLP used to extract and validate form fields (including a matcher tuned to United Wholesale Mortgage condition documents), before the extracted data is assembled into MISMO XML output. The service is built as a Django REST API and ships as a Docker container.
+
+**Stack:** Django, Django REST Framework, MySQL, Tesseract OCR, OpenCV, spaCy, pdfplumber, pdfminer.six, PyPDF2, Docker.",

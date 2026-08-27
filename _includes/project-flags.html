@@ -1,0 +1,17 @@
+{%- comment -%}
+  Renders the flag(s) for a project row on the Projects page, before its
+  title. include.project.country is a semicolon-separated list of codes from
+  _data/countries.csv (e.g. "pk;bd"), or "global" (or empty) for projects not
+  tied to one country, which get the globe icon instead.
+{%- endcomment -%}
+{%- assign proj_countries = include.project.country | split: ";" -%}
+<span class="proj-flags">
+  {%- if include.project.country and include.project.country != "global" -%}
+  {%- for code in proj_countries -%}
+  {%- assign c = site.data.countries | where: "code", code | first -%}
+  <img class="proj-flag" src="{{ '/assets/img/flags/' | append: code | append: '.svg' | relative_url }}" alt="{% if c %}{{ c.name }}{% else %}{{ code }}{% endif %}" width="18" height="13" loading="lazy">
+  {%- endfor -%}
+  {%- else -%}
+  <span class="proj-flag proj-flag--globe" title="Global" aria-label="Global">{% include icon.html name="globe" %}</span>
+  {%- endif -%}
+</span>

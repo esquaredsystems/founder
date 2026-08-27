@@ -282,9 +282,27 @@ in the front matter, not in the body. It is set apart from the poem automaticall
 
 ### Project write-ups
 
-`projects.csv` owns every project's title, org, year, tags and summary. A
-project that deserves a longer write-up also gets a file at
-`_projects/<slug>.md`, containing only its slug and the prose:
+`projects.csv` owns every project's title, org, year, tags, `country`,
+`summary` (a short one-line teaser, also used on the homepage cards and in
+`<meta description>`) and `detail` (the fuller write-up, shown collapsed
+behind a "+" on the Projects page). `detail` is rendered with the
+`markdownify` filter, so it can hold real markdown (links, emphasis,
+paragraphs) even though it's a CSV cell rather than a file — just remember
+Liquid tags inside it will NOT be evaluated (see the warning below).
+
+`country` is one or more codes from `_data/countries.csv`, semicolon-separated
+for a multi-country project (`"pk;bd;tj;tz"`), or the literal word `global`
+for something not tied to one country. `_includes/project-flags.html` reads
+it and renders the matching flag(s) before the project's title on the
+Projects page, falling back to a globe icon when the value is `global` or
+left empty. Adding a country here does nothing to the world map on the About
+page — that map is driven entirely by `_data/countries.csv` itself, which
+lists countries Owais has worked in or travelled to generally, not per
+project.
+
+A project that deserves its own standalone page instead of a collapsed entry
+gets a file at `_projects/<slug>.md`, containing only its slug and the prose
+(the `detail` column is then irrelevant for that row and can stay empty):
 
 ```markdown
 ---
@@ -295,9 +313,19 @@ The full write-up in markdown.
 ```
 
 The slug must match the `slug` column. Projects with a file get their own page
-at `/projects/<slug>/` and are linked from the list; projects without one appear
-in the list as plain text. Delete the file and the project stays listed, just
-without a page.
+at `/projects/<slug>/` and are linked from the list; projects without one show
+in the list as a collapsible entry (title, org, year and tags always visible;
+`detail` shown when clicked open). Delete the file and the project drops back
+to a collapsible entry, using whatever text is in `detail`.
+
+**Only put a link inside `detail` as a literal URL**, e.g.
+`[TB REACH](/founder/projects/tb-reach/)` — not
+`{{ '/projects/tb-reach/' | relative_url }}`. CSV cells are inserted after
+Jekyll's own Liquid pass has already run, so any `{{ }}`/`{% %}` text sitting
+in a cell prints on the page exactly as typed instead of being evaluated. A
+`_projects/<slug>.md` file doesn't have this limitation — Jekyll renders
+collection documents through Liquid, so `relative_url` and friends work
+normally there.
 
 ---
 

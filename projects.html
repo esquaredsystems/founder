@@ -5,7 +5,7 @@ description: Software and research projects built for healthcare, education, pub
 permalink: /projects/
 ---
 {%- assign projects = site.data.projects | sort: "order" | reverse -%}
-{%- assign written_up = site.projects | map: "slug" -%}
+{%- assign full_page_slugs = site.projects | map: "slug" -%}
 
 <div class="wrap">
   <div class="page-head">
@@ -17,28 +17,43 @@ permalink: /projects/
 
   <ul class="items">
     {%- for project in projects -%}
-    {%- assign has_page = written_up | where_exp: "s", "s == project.slug" | size -%}
-    <li class="item">
-      <div class="item__head">
-        <div>
-          <h2 class="item__title">
-            {%- if has_page > 0 -%}
-            <a href="{{ '/projects/' | append: project.slug | append: '/' | relative_url }}">{{ project.title }}</a>
-            {%- else -%}
-            {{ project.title }}
-            {%- endif -%}
-          </h2>
-          <p class="item__sub">{{ project.org }}</p>
-        </div>
+    {%- assign is_full_page = full_page_slugs | where_exp: "s", "s == project.slug" | size -%}
+    {%- assign tags = project.tags | split: ";" -%}
+    <li class="item" id="{{ project.slug }}">
+      {%- if is_full_page > 0 -%}
+      <div class="proj-head">
+        {% include project-flags.html project=project %}
+        <h2 class="item__title">
+          <a href="{{ '/projects/' | append: project.slug | append: '/' | relative_url }}">{{ project.title }}</a>
+        </h2>
+        <span class="proj-org">{{ project.org }}</span>
         <span class="item__year">{{ project.year }}</span>
+        {%- if tags.size > 0 %}
+        <div class="tags">
+          {%- for t in tags %}<span class="tag">{{ t | strip | downcase | replace: " ", "-" }}</span>{% endfor -%}
+        </div>
+        {%- endif %}
       </div>
-      <p class="item__body">{{ project.summary }}</p>
-      {%- assign tags = project.tags | split: ";" %}
-      {%- if tags.size > 0 %}
-      <div class="tags" style="margin-top:0.7rem">
-        {%- for t in tags %}<span class="tag">{{ t | strip }}</span>{% endfor -%}
-      </div>
-      {%- endif %}
+      {%- else -%}
+      <details class="item__details">
+        <summary>
+          <div class="proj-head">
+            {% include project-flags.html project=project %}
+            <h2 class="item__title">{{ project.title }}</h2>
+            <span class="proj-org">{{ project.org }}</span>
+            <span class="item__year">{{ project.year }}</span>
+            {%- if tags.size > 0 %}
+            <div class="tags">
+              {%- for t in tags %}<span class="tag">{{ t | strip | downcase | replace: " ", "-" }}</span>{% endfor -%}
+            </div>
+            {%- endif %}
+          </div>
+        </summary>
+        <div class="item__body">
+          {{ project.detail | markdownify }}
+        </div>
+      </details>
+      {%- endif -%}
     </li>
     {%- endfor -%}
   </ul>
