@@ -6,6 +6,7 @@ permalink: /research/
 ---
 {% include site-vars.html %}
 {%- assign pubs = site.data.papers -%}
+{%- assign reviews = site.data.reviewing -%}
 
 <div class="wrap">
   <div class="page-head">
@@ -41,4 +42,30 @@ permalink: /research/
     </li>
     {%- endfor -%}
   </ul>
+
+  {%- if reviews and reviews.size > 0 -%}
+  <section class="section">
+    <div class="section__head"><h2>Peer Review</h2></div>
+    <p class="lede" style="margin-top:0">Service as a referee for journals and conferences.</p>
+    <ul class="items">
+      {%- for r in reviews -%}
+      <li class="item">
+        <div class="item__head">
+          <div>
+            <h3 class="item__title">{% if r.verify %}<a href="{{ r.verify }}" rel="noopener">{{ r.venue }}</a>{% else %}{{ r.venue }}{% endif %}</h3>
+            <p class="item__sub">{{ r.role }}{% if r.publisher %} · {{ r.publisher }}{% endif %}{% if r.count %} · {{ r.count }} review{% unless r.count == "1" %}s{% endunless %}{% endif %}</p>
+          </div>
+          <span class="item__year">{{ r.period }}</span>
+        </div>
+        {%- if r.detail %}<p class="item__body">{{ r.detail }}</p>{% endif %}
+        {%- if r.file %}
+        <p class="item__body" style="margin-top:0.6rem">
+          <a href="{{ r.file | relative_url }}">Certificate {% include icon.html name="download" %}</a>
+        </p>
+        {%- endif %}
+      </li>
+      {%- endfor -%}
+    </ul>
+  </section>
+  {%- endif -%}
 </div>
