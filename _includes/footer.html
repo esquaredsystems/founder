@@ -38,4 +38,7 @@
     </div>
   </div>
 </footer>
+{%- if page.extra_js -%}
+<script src="{{ page.extra_js | relative_url }}" defer></script>
+{%- endif -%}
 <script src="{{ '/assets/js/site.js' | relative_url }}" defer></script>

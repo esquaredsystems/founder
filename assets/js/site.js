@@ -132,3 +132,39 @@
   window.addEventListener('hashchange', openTarget);
   openTarget();
 })();
+
+
+/* Gallery lightbox: GLightbox (vendored, assets/vendor/glightbox/, MIT).
+   Only loaded on pages that opt in via `extra_js` in front matter, and only
+   initialised if it actually loaded and the page has something to light up. */
+(function () {
+  if (typeof GLightbox === 'undefined') return;
+  if (!document.querySelector('.glightbox')) return;
+  GLightbox({ selector: '.glightbox', touchNavigation: true, loop: true });
+})();
+
+/* Gallery slideshow prev/next buttons: scroll the track by one slide's
+   width (plus its gap) instead of an arbitrary fixed amount, so a click
+   always lands the next photo at the snap point regardless of viewport
+   width. No-ops if the markup isn't on the page. */
+(function () {
+  var track = document.querySelector('.gallery-track');
+  if (!track) return;
+  var prev = document.querySelector('.gallery-nav--prev');
+  var next = document.querySelector('.gallery-nav--next');
+  if (!prev || !next) return;
+
+  function step() {
+    var slide = track.querySelector('.gallery-slide');
+    if (!slide) return track.clientWidth;
+    var gap = parseFloat(getComputedStyle(track).columnGap || getComputedStyle(track).gap || '0');
+    return slide.getBoundingClientRect().width + gap;
+  }
+
+  prev.addEventListener('click', function () {
+    track.scrollBy({ left: -step(), behavior: 'smooth' });
+  });
+  next.addEventListener('click', function () {
+    track.scrollBy({ left: step(), behavior: 'smooth' });
+  });
+})();

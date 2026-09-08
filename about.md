@@ -1,28 +1,23 @@
 ---
 layout: page
 title: About
-eyebrow: Who I am
-subtitle: Seventeen years between a compiler and a research question.
+eyebrow: About me
+subtitle: Decades between a compiler and a research question.
 permalink: /about/
+wide: true
+extra_css: /assets/vendor/glightbox/glightbox.min.css
+extra_js: /assets/vendor/glightbox/glightbox.min.js
 ---
 
-I am a software engineer and researcher based in Karachi. I hold a PhD in data
-mining from the Karachi Institute of Economics and Technology, and I have spent
-about seventeen years building software — from small internal tools to
-multinational-scale systems — mostly in healthcare, education and, more
-recently, emerging technology.
+<div class="prose" markdown="1">
 
-Most of my industry work has been in public health informatics: tuberculosis
-case-finding programmes, immunisation systems, laboratory integrations and
-national data warehouses across Pakistan, the Philippines, Tajikistan, Kenya,
-Zimbabwe and South Africa. The common thread is data that has to be correct,
-arrive on time, and survive poor connectivity — because a missed follow-up is a
-person, not a row.
+I am a software engineer and researcher based in Karachi. I hold a PhD in data mining from the Karachi Institute of Economics and Technology, and I have spent about seventeen years building software — from small internal tools to multinational-scale systems — mostly in healthcare, education and, more recently, emerging technology.
 
-My research is in **influence mining** — identifying the nodes in a complex
-network whose activation spreads furthest — along with applied machine learning
-in health informatics. More recently I have been working on Web3 security and
-decentralised systems.
+Most of my industry work has been in education and public health informatics: tuberculosis case-finding programmes, immunisation systems, laboratory integrations and national data warehouses across Pakistan, the Philippines, Tajikistan, Kenya, Zimbabwe and South Africa. The common thread is data that has to be correct, arrive on time, and survive poor connectivity — because a missed follow-up is a person, not a row.
+
+On the education side, I built the management information system for Greenwich University's Karachi campus in 2006 — registration, examinations, a front-desk inquiry system and a student portal — and since 2025 I've been an Associate Professor at KIET, supervising final year projects and theses and pulling the Software Engineering curriculum toward electives the industry actually needs. I also volunteer as a teacher at Esquared Academy, coaching Cambridge O-level students.
+
+My research is in **influence mining** — identifying the nodes in a complex network whose activation spreads furthest — along with applied machine learning in health informatics. More recently I have been working on Web3 security and decentralised systems.
 
 ## What I'm after
 
@@ -64,7 +59,7 @@ infrastructure · health informatics · decentralised applications.
 
 <ul class="items">
   <li class="item">
-    <h3 class="item__title">Teaching volunteer — GirlsWhoML</h3>
+    <h3 class="item__title">Teaching volunteer — GirlsWhoML (UK)</h3>
     <p class="item__body">Taught machine learning to two sessions and revised the course content to fit the audience of the South Asian region.</p>
   </li>
   <li class="item">
@@ -128,11 +123,30 @@ infrastructure · health informatics · decentralised applications.
 {%- endfor %}
 </div>
 
-## Elsewhere
+</div>
 
-I write at [Vision 360](https://owaisahussain.blogspot.com/) about technology
-and development, and keep a separate Urdu literary blog,
-<a href="https://bazmeanjum.blogspot.com/" class="urdu">مرے جنوں کو سنبھالے اگر یہ ویرانہ</a>.
+## Gallery
+{% assign photos = site.data.gallery | sort: "year" | reverse %}
+
+<div class="gallery-slideshow">
+  <button type="button" class="gallery-nav gallery-nav--prev" aria-label="Previous photo">{% include icon.html name="chevron-left" %}</button>
+  <ul class="gallery-track">
+    {%- for photo in photos -%}
+    {%- assign full_caption = photo.caption -%}
+    {%- if photo.year %}{% assign full_caption = photo.caption | append: " (" | append: photo.year | append: ")" %}{% endif -%}
+    {%- assign gb_caption = full_caption | replace: ':', '\:' | replace: ';', '\;' -%}
+    <li class="gallery-slide">
+      <a class="glightbox" href="{{ '/assets/img/gallery/' | append: photo.file | relative_url }}" data-glightbox="description: {{ gb_caption }}">
+        <img src="{{ '/assets/img/gallery/' | append: photo.file | relative_url }}" alt="{{ full_caption }}" loading="lazy" width="800" height="600">
+        <div class="gallery-slide__caption">{{ full_caption }}</div>
+      </a>
+    </li>
+    {%- endfor -%}
+  </ul>
+  <button type="button" class="gallery-nav gallery-nav--next" aria-label="Next photo">{% include icon.html name="chevron-right" %}</button>
+</div>
+
+<div class="prose" markdown="1">
 
 ## Contact
 
@@ -144,3 +158,5 @@ and development, and keep a separate Urdu literary blog,
   <a class="btn" href="{{ '/projects/' | relative_url }}">Projects {% include icon.html name="arrow" %}</a>
   <a class="btn" href="{{ '/research/' | relative_url }}">Research {% include icon.html name="arrow" %}</a>
 </p>
+
+</div>

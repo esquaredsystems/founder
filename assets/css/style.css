@@ -213,6 +213,12 @@ th {
 .prose { max-width: var(--prose); }
 .prose h2 { margin-top: 2.4rem; }
 .prose h3 { margin-top: 2rem; }
+
+/* .page-body (the `page.wide: true` alternative to .prose, see
+   _layouts/page.html) has no width cap, so a section like About's Gallery
+   can sit directly inside it rather than inside .prose. It still needs the
+   same top-of-section breathing room .prose gives its own headings. */
+.page-body > h2 { margin-top: 2.4rem; }
 .prose ul, .prose ol { padding-left: 1.2rem; }
 .prose li { margin-bottom: 0.4rem; }
 
@@ -549,6 +555,112 @@ a.card:hover {
 }
 .card__body { color: var(--text-muted); font-size: 0.95rem; margin: 0; flex: 1; }
 .card__foot { margin-top: 0.9rem; }
+
+/* --------------------------------------------------------------- gallery -- */
+.gallery-slideshow {
+  position: relative;
+  margin: 0 0 0.5rem;
+}
+
+.gallery-track {
+  list-style: none;
+  margin: 0;
+  padding: 0.3rem 0.3rem 1.1rem;
+  display: flex;
+  gap: 1.25rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  scroll-padding-left: 0.3rem;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+.gallery-track::-webkit-scrollbar { height: 8px; }
+.gallery-track::-webkit-scrollbar-track { background: transparent; }
+.gallery-track::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+.gallery-slide {
+  position: relative;
+  flex: 0 0 auto;
+  width: min(420px, 78vw);
+  scroll-snap-align: center;
+  border-radius: calc(var(--radius) * 1.6);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  transition: transform 0.2s ease;
+}
+.gallery-slide:hover { transform: translateY(-3px); }
+.gallery-slide a { display: block; position: relative; }
+.gallery-slide img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  display: block;
+  background: var(--bg-soft);
+}
+.gallery-slide__caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 3rem 1.1rem 0.9rem;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.82) 0%, rgba(0, 0, 0, 0.5) 45%, rgba(0, 0, 0, 0) 78%);
+  color: #fff;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+/* Edge fades hint that the strip keeps going, in both directions. Sit above
+   the track but below the nav buttons; only shown once there's room for a
+   button beside them (see the media query below the nav rules). */
+.gallery-slideshow::before,
+.gallery-slideshow::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 1.1rem;
+  width: clamp(24px, 6vw, 64px);
+  pointer-events: none;
+  z-index: 1;
+}
+.gallery-slideshow::before { left: 0; background: linear-gradient(to right, var(--bg), transparent); }
+.gallery-slideshow::after { right: 0; background: linear-gradient(to left, var(--bg), transparent); }
+
+.gallery-nav {
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--bg);
+  color: var(--text);
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+.gallery-nav:hover { background: var(--accent); color: #fff; transform: translateY(-50%) scale(1.05); }
+.gallery-nav svg { width: 22px; height: 22px; }
+.gallery-nav--prev { left: -0.4rem; }
+.gallery-nav--next { right: -0.4rem; }
+
+/* Buttons need somewhere to sit outside the track without clipping it, and
+   don't help much on a touchscreen anyway -- hide below the point they'd
+   start overlapping the photos. */
+@media (max-width: 640px) {
+  .gallery-nav { display: none; }
+}
+
+/* GLightbox's own overlay stays dark regardless of site theme (the usual
+   convention for a lightbox) — just match its caption type to the site. */
+.gdesc-inner { font-family: var(--font-body); }
 
 /* ------------------------------------------------------------------ tags -- */
 .tags { display: flex; flex-wrap: wrap; gap: 0.35rem; }

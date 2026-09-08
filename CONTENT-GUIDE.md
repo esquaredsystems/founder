@@ -32,6 +32,7 @@ GitHub web editor. Read the encoding note at the bottom before using Excel.
 | `grades.csv` | The grade distribution chart at the bottom of Teaching |
 | `certifications.csv` | The Certifications page |
 | `timeline.csv` | The career strip across the home page |
+| `gallery.csv` | The Gallery section on the About page |
 
 ---
 
@@ -84,6 +85,86 @@ and hovering shows only the name. It needs a matching flag file. Copy the `4x3` 
 [flag-icons](https://github.com/lipis/flag-icons) (MIT) into
 `assets/img/flags/<code>.svg`, lowercase ISO 3166-1 alpha-2. A row without a
 flag file still works, the flag is just a broken image.
+
+**gallery.csv** is `file`, `caption` and `year`. `file` is a filename in
+`assets/img/gallery/`, nothing more — no path, no leading slash. Add a photo by
+dropping the file in that folder and adding a row; there is no naming
+convention linking the two beyond the exact filename. `year` is a bare
+4-digit number (it's the one numeric column here, so it follows the
+quoting rule: unquoted) — leave it truly empty, not `""`, for a photo with
+no known year. The Gallery section sorts by `year` descending, newest first;
+Liquid's `sort` puts nil values first ascending, so `reverse` sends undated
+photos to the very end rather than scattering them among dated ones. The
+template appends `year` to the displayed caption itself (`Caption text
+(2019)`), so there's nothing to keep in sync by hand. Keep images web-sized
+(roughly 1600px on the long edge, JPEG); the ones already there were
+processed with `convert -auto-orient -strip -resize 1600x1600> -quality 82`.
+
+The Gallery lives inside `about.md` (there is no standalone `/gallery/`
+page) as a `## Gallery` section between Skills and Contact, and renders as a
+horizontal slideshow — large `min(420px, 78vw)`-wide slides, scroll-snapped
+to center, with round prev/next buttons and a caption overlaid on each photo
+under a dark gradient — via `.gallery-slideshow`/`.gallery-track`/
+`.gallery-slide` in `assets/css/style.css`, not a plain grid or a bare
+scrolling strip of thumbnails. The prev/next buttons are plain `<button>`
+elements; their click handler lives in `assets/js/site.js` and scrolls the
+track by exactly one slide's width plus its gap, so a click always lands the
+next photo on the snap point regardless of viewport width. Clicking a photo
+itself still opens it in a lightbox ([GLightbox](https://biati-digital.github.io/glightbox/),
+MIT, vendored at `assets/vendor/glightbox/` rather than pulled from a CDN,
+matching how the site's fonts are handled). About opts into it (and into
+`wide: true`, needed so the slideshow isn't squeezed into the narrow prose
+column — see below) via two front-matter keys — `extra_css:
+/assets/vendor/glightbox/glightbox.min.css` and `extra_js:
+/assets/vendor/glightbox/glightbox.min.js` — read by `head.html` and
+`footer.html` respectively; a page without those keys never loads the
+library. The lightbox init call lives in `assets/js/site.js` too, guarded to
+do nothing if GLightbox isn't loaded or the page has no `.glightbox` links.
+Reuse the same `extra_css`/`extra_js` pair for any future page that needs a
+page-specific asset, instead of adding another library to every page's
+`<head>`. The two chevron icons the nav buttons use were added to
+`_includes/icon.html` (`chevron-left`/`chevron-right`) following that file's
+existing `{% case include.name %}` pattern — add a new icon there the same
+way rather than inlining SVG markup elsewhere.
+
+**A note on `page.wide` and mixing markdown with raw HTML.** `about.md` sets
+`wide: true` so `_layouts/page.html` wraps its content in the unconstrained
+`.page-body` div instead of the narrower `.prose`; the prose-style sections
+(bio, Skills, Contact, etc.) then wrap themselves in an explicit `<div
+class="prose" markdown="1">...</div>` to keep their old narrow-column look,
+while the Gallery section sits outside that div at full page-body width. The
+`markdown="1"` attribute is required — kramdown does not parse markdown
+(`##` headings, `**bold**`, etc.) inside a raw HTML block unless told to.
+
+**A real Liquid syntax error this caused, and how it was found.** Keep
+Liquid's whitespace-control hyphens away from tags that sit directly between
+a heading and the next line: the hyphens strip *all* adjacent whitespace
+including blank lines, and kramdown needs that blank line to tell a heading
+and the following paragraph apart. A first attempt used trimming tags right
+after the Gallery heading and collapsed it into the next paragraph on the
+same line. The fix was to drop the trim dashes on that one block (plain,
+untrimmed comment/assign tags), which was verified with a hand-written
+Python simulation of Liquid's whitespace-trim rule -- and that simulation is
+exactly where the next mistake slipped through. **The explanation text
+written into that comment block itself described the trim-dash syntax
+literally** (backtick-quoted curly-percent characters), and Liquid's own
+tokenizer scans the raw template for tag-like boundaries *before* the
+comment tag gets a chance to treat its body as inert text -- so that
+explanatory prose broke the live build with `Liquid syntax error ... Tag
+'...' was not properly terminated`, even though it rendered as "PARSE OK"
+under a hand-rolled simulation and looked completely fine on review. It only
+surfaced when Owais actually ran `bundle exec jekyll build` locally. **Never
+put a literal tag-looking sequence -- curly-percent characters, even inside
+backticks or prose -- anywhere in a Liquid comment block, or anywhere else
+in a template.** The reliable way to check a template's Liquid syntax
+without a full Jekyll build is to parse it with the real `liquid` gem
+directly: clone `https://github.com/Shopify/liquid` at the version pinned in
+this repo's `Gemfile.lock` (`liquid (4.0.4)` as of this writing -- newer
+Liquid versions handle comment bodies more defensively and will *not*
+reproduce this bug, so testing against the right version matters), then
+`$LOAD_PATH.unshift` its `lib` and call `Liquid::Template.parse(text)` on
+the file's content with front matter stripped -- a real parse error there is
+a real parse error in Jekyll, unlike a hand-simulated whitespace check.
 
 The map itself is a static SVG at `_includes/world-map.svg`, committed to the
 repo. Regenerate it only if you want a different projection or resolution:
@@ -394,3 +475,13 @@ CSV rarely fails a build. A broken quote in a cell is the usual cause.
 
 **A change didn't appear.** Give it a minute or two; GitHub Pages rebuilds
 asynchronously. If it still hasn't, check the commit actually included the file.
+
+**`git add`/`git status` fails with "Unable to create .../index.lock: File
+exists".** A leftover lock file from an earlier interrupted git process, not a
+real conflict. Check nothing is actually running (`ps aux | grep git`); if it's
+empty, the lock is stale. Don't `rm` it directly — on this repo's mount, a
+direct delete of `.git/index.lock` (and of `.git/objects/*/tmp_obj_*` files
+git leaves behind) can fail with "Operation not permitted" even when file
+deletion is otherwise allowed. Instead `mv` it out of the way, e.g. into a
+`.git/_stale_locks/` folder, and re-run the git command — git creates a fresh
+lock and proceeds normally.
