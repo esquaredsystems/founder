@@ -1,0 +1,20 @@
+---
+layout: page
+eyebrow: Teaching
+title: Training
+permalink: /trainings/view/
+sitemap: false
+---
+<p><a href="{{ '/teaching/' | relative_url }}">&larr; Teaching</a></p>
+<div id="catalog-view">Loading&hellip;</div>
+<script src="{{ '/assets/js/catalog-view.js' | relative_url }}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  renderCatalogView({
+    jsonUrl: '{{ "/trainings/trainings.json" | relative_url }}',
+    listUrl: '{{ "/teaching/" | relative_url }}',
+    listLabel: 'Teaching',
+    siteTitle: {{ site.title | jsonify }}
+  });
+});
+</script>

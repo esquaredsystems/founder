@@ -888,7 +888,7 @@ html[data-theme="dark"] .draft-note {
 .bar__label, .bar__value { font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-faint); }
 .bar__value { text-align: right; }
 .bar__track { height: 8px; background: var(--bg-soft); border: 1px solid var(--border); border-radius: 100px; overflow: hidden; }
-.bar__fill { height: 100%; background: var(--accent); border-radius: 100px; }
+.bar__fill { display: block; height: 100%; background: var(--accent); border-radius: 100px; }
 
 /* ----------------------------------------------------------------- posts -- */
 .post-meta {
@@ -994,34 +994,50 @@ html[data-theme="dark"] .chip--on:hover { color: #10201d; }
   .two-col { grid-template-columns: 1fr; }
 }
 
-details.course {
+.course {
   border-top: 1px solid var(--border);
   padding: 0.9rem 0;
 }
-details.course summary {
+.course__title {
   cursor: pointer;
   font-family: var(--font-display);
   font-size: var(--step-1);
-  list-style: none;
   display: flex;
   align-items: baseline;
   justify-content: space-between;
   gap: 1rem;
+  color: var(--text);
+  text-decoration: none;
 }
-details.course summary::-webkit-details-marker { display: none; }
-details.course summary::after {
-  content: "+";
-  font-family: var(--font-mono);
+.course__title svg {
+  width: 0.9rem;
+  height: 0.9rem;
+  flex: none;
   color: var(--text-faint);
-  font-size: 1.1rem;
 }
-details.course[open] summary::after { content: "−"; }
-details.course .course__body {
+.course__title:hover { color: var(--accent); }
+.course__title:hover svg { color: var(--accent); }
+.course .course__body {
   margin-top: 0.8rem;
   color: var(--text-muted);
   font-size: 0.95rem;
   max-width: var(--prose);
 }
+
+/* The dedicated page a course/training title links out to (catalog-view.js
+   renders its content from the matching JSON file at build time). */
+.catalog-video {
+  margin: 0 0 1.6rem;
+  max-width: var(--prose);
+}
+.catalog-video video {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  display: block;
+  background: #000;
+}
+.catalog-video .course__meta { margin-top: 0.5rem; }
 /* Date and venue, directly under the title of a training. */
 .course__meta {
   margin: 0.35rem 0 0;

@@ -1,0 +1,24 @@
+---
+layout: null
+permalink: /trainings/trainings.json
+---
+{%- comment -%}
+  A video file is embedded as a player by default. List a video's exact
+  filename here (comma-separated) to keep it a plain download link instead,
+  the same way every other material already shows.
+{%- endcomment -%}
+{%- assign force_download = "4-decentralized-business-committee.mp4" | split: "," -%}
+[
+{%- for t in site.data.trainings -%}
+{%- assign prefix = t.slug | prepend: "/trainings/" | append: "/" -%}
+{%- assign files = site.static_files | where_exp: "f", "f.path contains prefix" | sort: "path" -%}
+{
+"slug": {{ t.slug | jsonify }},
+"title": {{ t.title | jsonify }},
+"date": {{ t.date | default: "" | jsonify }},
+"venue": {{ t.venue | default: "" | jsonify }},
+"summary": {{ t.summary | default: "" | jsonify }},
+"materials": [{%- for f in files -%}{"name": {{ f.basename | jsonify }}, "ext": {{ f.extname | remove: "." | jsonify }}, "path": {{ f.path | relative_url | jsonify }}, "kind": {% if f.extname == ".mp4" or f.extname == ".webm" or f.extname == ".mov" or f.extname == ".m4v" %}{% assign f_filename = f.basename | append: f.extname %}{% if force_download contains f_filename %}"file"{% else %}"video"{% endif %}{% else %}"file"{% endif %}}{% unless forloop.last %},{% endunless %}{%- endfor -%}]
+}{% unless forloop.last %},{% endunless %}
+{%- endfor -%}
+]

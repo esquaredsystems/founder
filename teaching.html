@@ -28,42 +28,19 @@ permalink: /teaching/
     <section style="margin-bottom:3rem">
       <h2 style="margin-bottom:0.5rem">{{ term.name }}</h2>
       {%- for course in term.items -%}
-      {%- assign course_prefix = course.course | slugify | prepend: "/courses/" | append: "/" -%}
-      <details class="course" open>
-        <summary>{{ course.course }}</summary>
+      {%- assign course_slug = course.course | slugify -%}
+      <div class="course">
+        <a class="course__title" href="{{ '/courses/view/?slug=' | append: course_slug | relative_url }}">
+          <span>{{ course.course }}</span>
+          {% include icon.html name="arrow" %}
+        </a>
         <div class="course__body">{{ course.topics }}</div>
-        {% include material-list.html prefix=course_prefix label="Course materials" %}
-      </details>
+      </div>
       {%- endfor -%}
     </section>
     {%- endfor -%}
 
-    {%- comment -%}
-      Trainings are listed in _data/trainings.csv. The file's own
-      order is the display order. Each row's `slug` names its folder under
-      `trainings/`; a row without a folder simply shows no slides.
-    {%- endcomment -%}
     <section style="margin-bottom:3rem">
-      <h2 style="margin-bottom:0.5rem">Trainings</h2>
-      <p class="muted" style="max-width:64ch;margin-bottom:1.4rem">{{ trainings_intro }}</p>
-      {%- for training in site.data.trainings -%}
-      {%- assign training_prefix = training.slug | prepend: "/trainings/" | append: "/" -%}
-      <details class="course">
-        <summary>{{ training.title }}</summary>
-        {%- if training.date or training.venue %}
-        <p class="course__meta">
-          {%- if training.date %}{{ training.date }}{% endif -%}
-          {%- if training.date and training.venue %} · {% endif -%}
-          {%- if training.venue %}{{ training.venue }}{% endif -%}
-        </p>
-        {%- endif %}
-        <div class="course__body">{{ training.summary }}</div>
-        {% include material-list.html prefix=training_prefix label="Slides" %}
-      </details>
-      {%- endfor -%}
-    </section>
-
-    <section>
       <h2>Aggregate grades</h2>
       <p class="muted" style="max-width:60ch">Distribution across all courses taught to date.</p>
       <div class="bars">
@@ -76,5 +53,32 @@ permalink: /teaching/
         {%- endfor -%}
       </div>
     </section>
+
+    {%- comment -%}
+      Trainings are listed in _data/trainings.csv. The file's own
+      order is the display order. Each row's `slug` names its folder under
+      `trainings/`; a row without a folder simply shows no slides.
+    {%- endcomment -%}
+    <section style="margin-bottom:3rem">
+      <h2 style="margin-bottom:0.5rem">Trainings</h2>
+      <p class="muted" style="max-width:64ch;margin-bottom:1.4rem">{{ trainings_intro }}</p>
+      {%- for training in site.data.trainings -%}
+      <div class="course">
+        <a class="course__title" href="{{ '/trainings/view/?slug=' | append: training.slug | relative_url }}">
+          <span>{{ training.title }}</span>
+          {% include icon.html name="arrow" %}
+        </a>
+        {%- if training.date or training.venue %}
+        <p class="course__meta">
+          {%- if training.date %}{{ training.date }}{% endif -%}
+          {%- if training.date and training.venue %} · {% endif -%}
+          {%- if training.venue %}{{ training.venue }}{% endif -%}
+        </p>
+        {%- endif %}
+        <div class="course__body">{{ training.summary }}</div>
+      </div>
+      {%- endfor -%}
+    </section>
+
   </div>
 </div>
